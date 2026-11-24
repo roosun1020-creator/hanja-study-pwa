@@ -145,3 +145,51 @@
 @media(max-width:380px){.attack-stage{height:clamp(242px,67vw,300px)}.attack-stage .figures{inset:33px 3px 48px}.battle-score-strip{font-size:12px}.skills-grid img{height:40px}}
 
 .dragon-perk-tip{font-size:clamp(12px,3vw,14px);font-weight:750;color:#6a528f;line-height:1.5;margin:0 0 15px;background:#fff8df;border:1px solid #f1dfad;padding:10px 12px;border-radius:12px}
+
+/* v2.1.0 — 20-unit fantasy adventure map; mobile-first, no extra assets */
+@media(max-width:520px){.menu{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}}
+.adventure-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:10px 0 16px}
+.adventure-summary span{background:#f5effe;border:1px solid #e8daf7;border-radius:12px;padding:10px 5px;text-align:center;font-size:clamp(10px,2.9vw,13px);font-weight:850;color:#64458f;min-width:0}
+.adventure-region-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.adventure-region{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;position:relative;min-width:0;min-height:125px;border:3px solid #e4d5f0;border-radius:19px;background:linear-gradient(145deg,#fff,#f8f0ff);color:#4a386d;box-shadow:0 4px 0 #e6dced;padding:11px 5px;cursor:pointer;text-align:center}
+.adventure-region.selected{border-color:#8e67d0;box-shadow:0 4px 0 #6541a1,0 0 0 3px #ecdcff;background:#f6efff}
+.adventure-region-icon{font-size:36px;line-height:1.1}
+.adventure-region strong{font-size:clamp(14px,3.7vw,18px);word-break:keep-all}
+.adventure-region small{font-size:clamp(11px,2.9vw,13px);color:#79658f;font-weight:750}
+.adventure-region.lake{background:linear-gradient(145deg,#e9f9ff,#f8f4ff)}.adventure-region.volcano{background:linear-gradient(145deg,#fff4ea,#fff6f4)}.adventure-region.castle{background:linear-gradient(145deg,#fff8db,#f4e9ff)}
+.adventure-seal{color:#8c5413;background:#fff2bd;padding:3px 7px;border-radius:99px;font-weight:850;font-size:10px;margin-top:4px}
+.adventure-landscape{position:relative;height:clamp(140px,34vw,210px);overflow:hidden;border:2px solid #dfd0e9;border-radius:21px;background:linear-gradient(180deg,#bfeaff 0%,#edfcff 55%,#a9df8e 56%,#68ba79 100%)}
+.adventure-landscape.lake{background:linear-gradient(180deg,#b7e6ff 0%,#f9fdff 52%,#5bcbec 53%,#318cca 100%)}
+.adventure-landscape.volcano{background:linear-gradient(180deg,#ffd8be 0%,#fff7df 54%,#aa7776 55%,#8a5b64 100%)}
+.adventure-landscape.castle{background:linear-gradient(180deg,#c9d1ff 0%,#fff5d8 55%,#b6a7e7 56%,#927bc4 100%)}
+.adventure-landscape-sun{position:absolute;right:11%;top:15%;height:52px;width:52px;background:#fff9d1;border-radius:50%;box-shadow:0 0 30px #fff6a9}
+.adventure-landscape-hill{position:absolute;width:125%;height:120px;left:-16%;bottom:-85px;border-radius:50% 50% 0 0;background:#58ad78;opacity:.58}
+.adventure-landscape.lake .adventure-landscape-hill{background:#1867be}.adventure-landscape.volcano .adventure-landscape-hill{background:#b75b54}.adventure-landscape.castle .adventure-landscape-hill{background:#7056b6}
+.adventure-landscape-icon{position:absolute;right:11%;bottom:12%;font-size:clamp(55px,14vw,100px);filter:drop-shadow(0 7px 4px #42514855)}
+.adventure-landscape-caption{position:absolute;left:12px;top:13%;max-width:65%;display:flex;flex-direction:column;gap:8px;color:#3a3568;text-shadow:0 1px 1px #ffffffba}
+.adventure-landscape-caption strong{font-size:clamp(23px,6.6vw,37px);line-height:1.2}
+.adventure-landscape-caption span{font-size:clamp(12px,3.3vw,16px);font-weight:800;word-break:keep-all}
+.adventure-progress{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:clamp(12px,3.2vw,15px);font-weight:800;color:#76539c;padding:12px 3px 0}
+.adventure-banner{text-align:center;background:#f2e9ff;border-radius:15px;padding:12px 6px;color:#714f9e;font-weight:900;margin:9px 0 17px}
+.adventure-trail{position:relative;display:flex;flex-direction:column;gap:13px;margin:16px 0 18px}
+.adventure-trail::before{content:"";position:absolute;left:27px;top:35px;bottom:35px;border-left:5px dashed #a4c59c;opacity:.65}
+.adventure-stop{display:flex;align-items:flex-start;gap:12px;position:relative}
+.adventure-pin{z-index:1;flex:0 0 56px;height:56px;border:3px solid white;border-radius:50%;background:#91bf7f;display:grid;place-items:center;color:white;font-weight:950;font-size:21px;box-shadow:0 0 0 3px #d9ebd1,0 3px 8px #0001}
+.adventure-stop.cleared .adventure-pin{background:#efad3a;box-shadow:0 0 0 3px #fff0c2}
+.adventure-stop.boss .adventure-pin{background:#a86bd7;box-shadow:0 0 0 3px #dfc6f6}
+.adventure-stop-card{flex:1;min-width:0;border:2px solid #e3d5ef;background:#fff;border-radius:18px;padding:11px 12px;box-shadow:0 3px 0 #ebe3f2}
+.adventure-stop.boss .adventure-stop-card{background:linear-gradient(135deg,#fffbee,#f6edff);border-color:#d7b4e8}
+.adventure-stop-header{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap}
+.adventure-stop-header strong{font-size:clamp(15px,3.7vw,19px);color:#513e72}
+.adventure-state{font-weight:850;color:#7155a0;font-size:clamp(11px,2.7vw,13px)}
+.adventure-note{font-size:clamp(11px,2.9vw,13px);color:#827391;line-height:1.5;margin:7px 0 9px}
+.adventure-stop-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.adventure-stop-actions button{border:2px solid #ddd1ee;border-radius:12px;padding:9px 4px;min-height:45px;font-size:clamp(12px,3.1vw,15px);font-weight:850;cursor:pointer;color:#68478a;background:#f7f0ff}
+.adventure-stop-actions button.adventure-fight{color:#fff;background:#8056bf;border-color:#7045ae}
+.adventure-stop-actions button:disabled{opacity:.47;cursor:not-allowed}
+.adventure-boss-info{display:flex;align-items:center;gap:7px;padding:7px 0 1px}
+.adventure-boss-mini{height:65px;width:65px;object-fit:contain;filter:drop-shadow(0 3px 4px #0001)}
+.adventure-boss-info div{display:flex;flex-direction:column;gap:5px}
+.adventure-boss-info b{font-size:15px;color:#7a4b9c}.adventure-boss-info small{font-size:12px;color:#827190}
+.boss-victory{background:#fff1be;color:#8b541e;border-radius:12px;padding:10px;font-weight:900;line-height:1.6}
+@media(max-width:380px){.adventure-stop{gap:7px}.adventure-pin{flex-basis:46px;height:46px;font-size:18px}.adventure-trail::before{left:21px}.adventure-stop-card{padding:9px}.adventure-stop-actions{gap:5px}.adventure-stop-actions button{min-height:43px;padding:7px 2px;font-size:12px}.adventure-summary{gap:4px}}

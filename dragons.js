@@ -34,7 +34,7 @@ function gameInfo(){const game=state.progress.game,units=completedUnits();let wi
 }
 function monsterForScope(scope,units){
   let unit=scope.startsWith('신규 ')?Number(scope.match(/\d+/)?.[0]||1):scope==='학습 완료 한자'?Math.max(1,Math.min(units,20)):1;
-  if(unit===20)return 'shadow_dragon';if(unit===15)return 'ancient_ent';if(unit===10)return 'stone_guardian';
+  if(unit===5)return 'mushroom';if(unit===20)return 'shadow_dragon';if(unit===15)return 'ancient_ent';if(unit===10)return 'stone_guardian';
   if(unit<=3)return 'slime';if(unit<=6)return 'sprout_imp';if(unit<=9)return 'mushroom';if(unit<=12)return 'crystal_bat';if(unit<=14)return 'storm_fox';
   if(unit<=17)return 'flame_wisp';return unit===18?'storm_fox':'flame_wisp';
 }
@@ -107,7 +107,9 @@ function renderDragons(){
   }
   if(battle.idx>=5){
     const won=battle.correct>=4;
-    return panel('🏅 드래곤 배틀 결과',`<div class="dragon-hero-info"><img src="${dragonArt(current,stage)}" alt="${d.name}"><div><h2>${won?'🎉 승리!':'🌱 다시 도전해요!'}</h2><p>${battle.questions.length}문제 중 ${battle.correct}문제 정답</p><div class="battle-final-score">${battleStarLabel(battle.correct)} · 전투 점수 ${battle.score||0}점</div><p class="battle-combo-note">최대 연속 정답 ${battle.maxCombo||0}개 · 정답 수가 승리를 결정해요.</p>${battle.winReward?'첫 승리 경험치 +30XP!':won?'이미 첫 승리 보상을 받았어요.':'틀린 한자를 복습하면 더 강해져요.'}</div></div>
+    const bossUnit=Number(battle.scope.match(/^신규 (5|10|15|20)단원$/)?.[1]||0);
+    const bossTitle=bossUnit?({5:'새싹의 숲',10:'반짝이는 호수',15:'불꽃 산맥',20:'수호자의 성'}[bossUnit]):'';
+    return panel('🏅 드래곤 배틀 결과',`<div class="dragon-hero-info"><img src="${dragonArt(current,stage)}" alt="${d.name}"><div><h2>${won?'🎉 승리!':'🌱 다시 도전해요!'}</h2><p>${battle.questions.length}문제 중 ${battle.correct}문제 정답</p><div class="battle-final-score">${battleStarLabel(battle.correct)} · 전투 점수 ${battle.score||0}점</div><p class="battle-combo-note">최대 연속 정답 ${battle.maxCombo||0}개 · 정답 수가 승리를 결정해요.</p>${battle.winReward?'첫 승리 경험치 +30XP!':won?'이미 첫 승리 보상을 받았어요.':'틀린 한자를 복습하면 더 강해져요.'}${won&&bossUnit?`<p class="boss-victory">🏅 ${bossTitle} 수호자 격파! 모험 지도에 메달이 기록됐어요.</p>`:''}</div></div>
      <button class="button primary full big" data-action="battle-exit">다른 배틀 선택하기</button>`);
   }
   const q=battle.questions[battle.idx],enemy=MONSTERS[battle.enemy]||MONSTERS.slime,hp=Math.max(0,100-25*battle.correct);

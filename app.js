@@ -18,8 +18,8 @@ const QUIZ_SCOPE_LIST=[
   {id:'learned',title:'📚 내가 배운 한자'}
 ];
 const ALT={'金':'성 김','車':'수레 차','洞':'밝을 통','便':'똥오줌 변','食':'먹을 식','韓':'나라 한','漢':'한수 한'};
-const PAGES=['home','learn','quiz','review','writing','dragons','cards','records'];
-const PAGE_LABELS={home:'홈',learn:'배우기',quiz:'퀴즈',review:'복습',writing:'쓰기',dragons:'드래곤',cards:'한자 카드',records:'기록'};
+const PAGES=['home','learn','quiz','review','writing','map','dragons','cards','records'];
+const PAGE_LABELS={home:'홈',learn:'배우기',quiz:'퀴즈',review:'복습',writing:'쓰기',map:'모험 지도',dragons:'드래곤',cards:'한자 카드',records:'기록'};
 const htmlEscape=s=>String(s).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 let records=[],recordByChar=new Map(),state=null,dbPromise=null,busy=false;
 function todayKST(){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());}
@@ -32,7 +32,7 @@ const record=ch=>recordByChar.get(ch);
 const fullLabel=row=>row.meaning+' '+row.reading;
 function newDeck(scope,round=1){return {scope,deck:shuffle(pool(scope)),idx:0,revealed:false,round,seen:state?.seen||[]};}
 function freshProgress(){return {learned:[],cards:{},xp:0,active_days:[],game:{starter:null,active:null,owned:[],xp:0,won_battles:[]},writing:{practiced:[],attempts:{}}};}
-function defaultUI(){return {page:'home',learnSection:'new',learnUnitNew:1,learnGroupNew:0,learnUnitOld:1,learnGroupOld:0,learnIndex:0,quizScope:'all150',quiz:null,writingMode:'unit',writingGrade:'7급Ⅱ',writingUnit:1,writingPage:0,writingChar:null,dragonMode:'basic',dragonUnit:1,dragonScope:'8급 복습',battle:null,resetStep:false};}
+function defaultUI(){return {page:'home',learnSection:'new',learnUnitNew:1,learnGroupNew:0,learnUnitOld:1,learnGroupOld:0,learnIndex:0,quizScope:'all150',quiz:null,writingMode:'unit',writingGrade:'7급Ⅱ',writingUnit:1,writingPage:0,writingChar:null,dragonMode:'basic',dragonUnit:1,dragonScope:'8급 복습',mapRegion:1,battle:null,resetStep:false};}
 function stateDeckOK(s){
   if(!s||!SCOPE_LIST.some(o=>o.id===s.scope)||!Array.isArray(s.deck)||!Array.isArray(s.seen)||!Number.isInteger(s.idx))return false;
   const allowed=new Set(pool(s.scope)),all=new Set(records.map(x=>x.char));
@@ -84,6 +84,7 @@ function normalizeUI(raw,fromV200=false){
   if(Number.isInteger(raw.writingUnit)&&raw.writingUnit>=1&&raw.writingUnit<=10)ui.writingUnit=raw.writingUnit;
   if(Number.isInteger(raw.writingPage)&&raw.writingPage>=0&&raw.writingPage<=20)ui.writingPage=raw.writingPage;
   if(typeof raw.writingChar==='string'&&recordByChar.has(raw.writingChar))ui.writingChar=raw.writingChar;
+  if(Number.isInteger(raw.mapRegion)&&raw.mapRegion>=1&&raw.mapRegion<=4)ui.mapRegion=raw.mapRegion;
   if(['basic','unit'].includes(raw.dragonMode))ui.dragonMode=raw.dragonMode;
   if(Number.isInteger(raw.dragonUnit)&&raw.dragonUnit>=1&&raw.dragonUnit<=20)ui.dragonUnit=raw.dragonUnit;
   if(typeof raw.dragonScope==='string'&&['8급 복습','학습 완료 한자',...Array.from({length:20},(_,i)=>`신규 ${i+1}단원`)].includes(raw.dragonScope))ui.dragonScope=raw.dragonScope;
@@ -158,7 +159,8 @@ function renderHome(){
     ${due.length?'<button class="button full" data-page="review">🧠 오늘의 복습 시작</button>':''}`, 'hero-panel')+
     panel('🌟 오늘의 추천 단원',mission)+
     panel('🐉 드래곤과 함께하는 모험',`<p class="lead">한자 쓰기 연습으로 손끝을 단련하고, 드래곤과 함께 한자 배틀에 도전해 보세요!</p>
-      <div class="actions equal"><button class="primary" data-page="writing">✍️ 한자 쓰기</button><button class="primary" data-page="dragons">🐉 드래곤 배틀</button></div>`);
+      <div class="actions equal"><button class="primary" data-page="writing">✍️ 한자 쓰기</button><button class="primary" data-page="dragons">🐉 드래곤 배틀</button></div>`)+
+    panel('🗺️ 20단원 모험 지도',`<p class="lead">새싹의 숲에서 수호자의 성까지! 단원을 배우고 지역 보스에 도전해 보세요.</p><button class="button primary full big" data-page="map">🌟 모험 지도로 출발!</button>`); 
 }
 function newUnitChars(unit){return records.filter(r=>r.grade!=='8급').slice((unit-1)*5,unit*5).map(r=>r.char);}
 function oldUnitChars(unit){return records.filter(r=>r.grade==='8급').slice((unit-1)*5,unit*5).map(r=>r.char);}
@@ -276,7 +278,7 @@ function render(){
     const on=b.dataset.page===state.ui.page;
     b.classList.toggle('active',on);b.setAttribute('aria-current',on?'page':'false');
   });
-  const renderer={home:renderHome,learn:renderLearning,quiz:renderQuiz,review:renderReview,writing:renderWriting,dragons:renderDragons,cards:renderCards,records:renderRecords};
+  const renderer={home:renderHome,learn:renderLearning,quiz:renderQuiz,review:renderReview,writing:renderWriting,map:renderAdventureMap,dragons:renderDragons,cards:renderCards,records:renderRecords};
   $('page-content').innerHTML=renderer[state.ui.page]();
   $('parent-tools').hidden=state.ui.page!=='records'||$('parent-tools').dataset.open!=='true';
   if(state.ui.page==='writing'&&typeof mountWritingBoard==='function')mountWritingBoard();
@@ -321,7 +323,8 @@ $('page-content').addEventListener('click',e=>{
       case 'records-reset-cancel':u.resetStep=false;break;
       case 'records-reset-confirm':if(u.resetStep){state.progress=freshProgress();state.seen=[];Object.assign(state,newDeck(state.scope,1));u.quiz=null;u.resetStep=false;}break;
       default:
-        if(action.startsWith('write-'))handleWritingAction(action,val);
+        if(action.startsWith('map-'))handleAdventureAction(action,val);
+        else if(action.startsWith('write-'))handleWritingAction(action,val);
         else if(action.startsWith('dragon-')||action.startsWith('battle-'))handleDragonAction(action,val);
         else throw new Error('알 수 없는 동작: '+action);
     
