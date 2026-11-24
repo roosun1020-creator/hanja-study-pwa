@@ -195,11 +195,20 @@
 @media(max-width:380px){.adventure-stop{gap:7px}.adventure-pin{flex-basis:46px;height:46px;font-size:18px}.adventure-trail::before{left:21px}.adventure-stop-card{padding:9px}.adventure-stop-actions{gap:5px}.adventure-stop-actions button{min-height:43px;padding:7px 2px;font-size:12px}.adventure-summary{gap:4px}}
 
 /* v2.1.1 sprite frames; fallback images remain in DOM and accessible. */
-.sprite-holder{display:block;position:relative;flex-shrink:0;min-width:0;width:100%;}
+.sprite-holder{display:block;position:relative;flex-shrink:0;min-width:0;width:100%;overflow:visible;}
 .sprite-holder>img{display:block;width:100%!important;height:100%!important;object-fit:contain!important;transition:opacity .12s linear;}
-.sprite-holder>.sprite-canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;}
-.dragon-picker .sprite-holder{height:75px;margin:0 auto;}
-.dragon-hero-info .sprite-holder{width:clamp(110px,35vw,165px);height:144px;}
-.battle-actor .sprite-holder{height:clamp(102px,32vw,168px);}
-.attack-stage .unit .sprite-holder{height:75%;}
+.sprite-holder>.sprite-canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;transform:translateZ(0);}
+.dragon-picker .sprite-holder{height:82px;margin:0 auto;max-width:92px;}
+.dragon-hero-info .sprite-holder{width:clamp(118px,36vw,172px);height:152px;}
+.battle-actor .sprite-holder{height:clamp(112px,33vw,176px);}
+.attack-stage .unit .sprite-holder{height:82px;max-width:92px;margin:0 auto;}
 @media(max-width:520px){.dragon-picker .sprite-holder{height:75px}}
+
+/* v2.1.1.1 animation polish */
+.sprite-holder img,.sprite-holder canvas{image-rendering:auto;}
+.attack-stage .unit img{display:block;margin:0 auto;}
+
+/* v2.1.2: individual source frames now include safety padding. */
+.sprite-holder{overflow:visible}
+.sprite-holder>.sprite-canvas{image-rendering:auto;transform:none}
+.attack-stage .attack-dragon .sprite-holder{min-height:85px}

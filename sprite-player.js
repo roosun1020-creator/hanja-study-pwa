@@ -1,117 +1,171 @@
-/* 한자 탐험대 PWA v2.1.1 - 4-frame image sprite player.
- * Existing dragon portraits remain as fallbacks for stages 2/3 and missing files.
- * Animation frames are drawn from horizontal WebP sprite sheets on one canvas.
- * No changes to learning data, battle accuracy, XP, or storage.
+/* 한자 탐험대 PWA v2.1.2 — 실제 추가 이미지 프레임 재생기
+ * 아기 드래곤 3종 × (대기 8 / 공격 12 / 승리 8) 프레임.
+ * 기존 학습·전투 판정·저장 로직을 수정하지 않습니다.
  */
 (() => {
   'use strict';
-  const available = new Set(['fire','water','forest']);
-  const MODES = {idle: {fps: 5, loop: true}, attack: {fps: 8, loop: false}, victory: {fps: 5, loop: false}};
-  const cache = new Map();
-  const actors = new Set();
-  const states = new WeakMap();
-  const FRAMES = 4;
+  const ELEMENTS = new Set(['fire', 'water', 'forest']);
   const SIZE = 256;
-  let raf = 0;
+  const MODES = Object.freeze({
+    idle:    { frames: 8,  fps: 5.0, loop: true,  linger: 0 },
+    attack:  { frames: 12, fps: 5.5, loop: false, linger: 720 },
+    victory: { frames: 8,  fps: 5.2, loop: false, linger: 680 }
+  });
+  const imagePromises = new Map();
+  const actors = new Set();
+  const byHolder = new WeakMap();
+  let animationId = 0;
 
-  function source(key, mode) {return `./assets/animations/dragons/${key}_1_${mode}.webp`;}
-  function asset(key, mode) {
-    const url=source(key,mode);
-    if(!cache.has(url)){
-      cache.set(url,new Promise((resolve,reject)=>{
-        const image=new Image();
-        image.onload=()=>image.naturalWidth===FRAMES*SIZE&&image.naturalHeight===SIZE?resolve(image):reject(new Error('Invalid sprite sheet dimensions'));
-        image.onerror=()=>reject(new Error('Sprite unavailable: '+url));
-        image.src=url;
+  function loadImage(key, mode) {
+    const url = `./assets/animations/dragons/${key}_1_${mode}.webp`;
+    if (!imagePromises.has(url)) {
+      imagePromises.set(url, new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+          const size = MODES[mode].frames;
+          if (img.naturalWidth !== SIZE * size || img.naturalHeight !== SIZE) {
+            reject(new Error(`Invalid sprite size ${url}: ${img.naturalWidth}x${img.naturalHeight}`));
+          } else resolve(img);
+        };
+        img.onerror = () => reject(new Error('Sprite image failed to load: ' + url));
+        img.src = url;
       }));
     }
-    return cache.get(url);
+    return imagePromises.get(url);
   }
-  function show(actor,mode){
-    if(!actor||!MODES[mode])return;
-    const token=++actor.token;
-    actor.mode=mode;
-    actor.ended=false;
-    asset(actor.key,mode).then(image=>{
-      if(token!==actor.token||!actor.holder.isConnected)return;
-      actor.image=image;
-      actor.start=performance.now();
-      actor.last=-1;
-      actor.fallback.style.opacity='0';
-      actor.canvas.style.display='block';
-      draw(actor,0);
+
+  function snapshot(canvas) {
+    const image = document.createElement('canvas');
+    image.width = SIZE;
+    image.height = SIZE;
+    image.getContext('2d').drawImage(canvas, 0, 0);
+    return image;
+  }
+  function draw(actor, frame, now) {
+    if (!actor.sheet) return;
+    if (actor.lastFrame === frame && !actor.fade) return;
+    const ctx = actor.ctx;
+    ctx.clearRect(0, 0, SIZE, SIZE);
+    // Source frames are individually padded: draw 1:1 to avoid a second shrink.
+    ctx.drawImage(actor.sheet, frame * SIZE, 0, SIZE, SIZE, 0, 0, SIZE, SIZE);
+    if (actor.fade) {
+      const alpha = Math.max(0, 1 - (now - actor.fade.at) / 380);
+      if (alpha > 0) {
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.drawImage(actor.fade.previous, 0, 0);
+        ctx.restore();
+      } else actor.fade = null;
+    }
+    actor.lastFrame = frame;
+  }
+  function schedule() {
+    if (!animationId && !document.hidden) animationId = requestAnimationFrame(tick);
+  }
+  function changeMode(actor, mode) {
+    if (!MODES[mode]) return;
+    const previous = mode === 'idle' && actor.mode !== 'idle' && actor.canvas.style.display !== 'none'
+      ? snapshot(actor.canvas)
+      : null;
+    actor.mode = mode;
+    actor.ended = false;
+    actor.endAt = 0;
+    actor.fade = null;
+    actor.loading = true; // Hold the last visible frame while the next sheet is loading.
+    const token = ++actor.token;
+    loadImage(actor.key, mode).then(sheet => {
+      if (actor.token !== token || !actor.holder.isConnected) return;
+      actor.sheet = sheet;
+      actor.loading = false;
+      actor.startAt = performance.now();
+      actor.lastFrame = -1;
+      actor.fade = previous ? { previous, at: actor.startAt } : null;
+      actor.fallback.style.opacity = '0';
+      actor.canvas.style.display = 'block';
+      draw(actor, 0, actor.startAt);
       schedule();
-    }).catch(()=>{
-      // If an animation sheet is absent/corrupt, the original character stays visible.
-      if(token===actor.token){actor.canvas.style.display='none';actor.fallback.style.opacity='1';}
+    }).catch(err => {
+      if (actor.token !== token) return;
+      console.warn(err.message);
+      actor.sheet = null;
+      actor.loading = false;
+      actor.canvas.style.display = 'none';
+      actor.fallback.style.opacity = '1';
     });
   }
-  function draw(actor,frame){
-    if(!actor.image||actor.last===frame)return;
-    const ctx=actor.ctx;
-    ctx.clearRect(0,0,SIZE,SIZE);
-    ctx.drawImage(actor.image,frame*SIZE,0,SIZE,SIZE,0,0,SIZE,SIZE);
-    actor.last=frame;
-  }
-  function schedule(){if(!raf)raf=requestAnimationFrame(tick);}
-  function tick(now){
-    raf=0;
-    if(document.hidden)return;
-    for(const actor of Array.from(actors)){
-      if(!actor.holder.isConnected){actors.delete(actor);continue;}
-      if(!actor.image)continue;
-      const config=MODES[actor.mode]||MODES.idle;
-      const elapsed=Math.max(0,(now-actor.start)/1000);
-      const raw=Math.floor(elapsed*config.fps);
-      const index=config.loop?raw%FRAMES:Math.min(FRAMES-1,raw);
-      draw(actor,index);
-      if(!config.loop&&!actor.ended&&raw>=FRAMES){
-        actor.ended=true;
-        show(actor,'idle');
+  function tick(now) {
+    animationId = 0;
+    if (document.hidden) return;
+    for (const actor of Array.from(actors)) {
+      if (!actor.holder.isConnected) {
+        actors.delete(actor);
+        continue;
       }
+      if (!actor.sheet || actor.loading) continue;
+      const cfg = MODES[actor.mode];
+      const elapsed = Math.max(0, now - actor.startAt);
+      const raw = Math.floor((elapsed / 1000) * cfg.fps);
+      const frame = cfg.loop ? raw % cfg.frames : Math.min(cfg.frames - 1, raw);
+      draw(actor, frame, now);
+      if (!cfg.loop && !actor.ended && elapsed >= cfg.frames * 1000 / cfg.fps) {
+        actor.ended = true;
+        actor.endAt = now + cfg.linger;
+      }
+      if (actor.ended && now >= actor.endAt) changeMode(actor, 'idle');
     }
-    if(actors.size)schedule();
+    if (actors.size > 0) schedule();
   }
-  function mount(root=document){
-    if(!root)return;
-    const images=Array.from(root.querySelectorAll('img[data-sprite-dragon]'));
-    for(const img of images){
-      if(img.dataset.spriteMounted==='1')continue;
-      img.dataset.spriteMounted='1';
-      const key=img.dataset.spriteDragon,stage=Number(img.dataset.spriteStage);
-      if(stage!==1||!available.has(key))continue;
-      const holder=document.createElement('span');
-      holder.className='sprite-holder';
-      holder.dataset.spriteType=key;
-      img.parentNode.insertBefore(holder,img);
+  function mount(root = document) {
+    if (!root?.querySelectorAll) return;
+    for (const img of root.querySelectorAll('img[data-sprite-dragon]')) {
+      if (img.dataset.spriteMounted === '1') continue;
+      img.dataset.spriteMounted = '1';
+      const key = img.dataset.spriteDragon;
+      const stage = Number(img.dataset.spriteStage);
+      // Growth stages still use their original, stable portraits.
+      if (!ELEMENTS.has(key) || stage !== 1 || !img.parentNode) continue;
+      const holder = document.createElement('span');
+      holder.className = 'sprite-holder';
+      holder.dataset.spriteType = key;
+      img.parentNode.insertBefore(holder, img);
       holder.appendChild(img);
-      const canvas=document.createElement('canvas');
-      canvas.className='sprite-canvas';canvas.width=SIZE;canvas.height=SIZE;
-      canvas.style.display='none';canvas.setAttribute('aria-hidden','true');
+      const canvas = document.createElement('canvas');
+      canvas.className = 'sprite-canvas';
+      canvas.width = SIZE;
+      canvas.height = SIZE;
+      canvas.style.display = 'none';
+      canvas.setAttribute('aria-hidden', 'true');
       holder.appendChild(canvas);
-      const actor={key,holder,canvas,ctx:canvas.getContext('2d',{alpha:true}),fallback:img,token:0,image:null,last:-1,start:0,mode:'idle',ended:false};
-      if(!actor.ctx)continue;
-      states.set(holder,actor);actors.add(actor);
-      show(actor,MODES[img.dataset.spriteState]?img.dataset.spriteState:'idle');
+      const ctx = canvas.getContext('2d', { alpha: true });
+      if (!ctx) continue;
+      const actor = { key, holder, canvas, ctx, fallback: img, token: 0,
+        sheet: null, lastFrame: -1, startAt: 0, mode: 'idle',
+        ended: false, endAt: 0, fade: null, loading: false };
+      actors.add(actor);
+      byHolder.set(holder, actor);
+      changeMode(actor, MODES[img.dataset.spriteState] ? img.dataset.spriteState : 'idle');
     }
     schedule();
   }
-  function play(root,mode){
-    if(!root||!MODES[mode])return;
-    const holder=root.matches?.('.sprite-holder')?root:root.querySelector?.('.sprite-holder');
-    const actor=holder?states.get(holder):null;
-    if(actor)show(actor,mode);
+  function play(root, mode) {
+    if (!root || !MODES[mode]) return;
+    const holder = root.matches?.('.sprite-holder') ? root : root.querySelector?.('.sprite-holder');
+    const actor = holder ? byHolder.get(holder) : null;
+    if (actor) changeMode(actor, mode);
   }
-  function install(){
+  function setup() {
     mount(document);
-    const page=document.querySelector('#page-content');
-    const modal=document.querySelector('#attack-dialog');
-    const observer=new MutationObserver(()=>mount(document));
-    if(page)observer.observe(page,{childList:true,subtree:true});
-    if(modal)observer.observe(modal,{childList:true,subtree:true});
-    document.addEventListener('visibilitychange',()=>{if(!document.hidden)schedule();});
+    const obs = new MutationObserver(() => mount(document));
+    for (const id of ['page-content', 'attack-dialog']) {
+      const el = document.getElementById(id);
+      if (el) obs.observe(el, { childList: true, subtree: true });
+    }
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) schedule();
+    });
   }
-  window.HanjaSprites={mount,play,version:'2.1.1-phase1'};
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});
-  else install();
+  window.HanjaSprites = { mount, play, version: '2.1.2', modes: MODES };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setup, { once: true });
+  } else setup();
 })();

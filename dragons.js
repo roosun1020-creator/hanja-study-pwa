@@ -1,4 +1,4 @@
-/* 한자 탐험대 PWA v2.0.3 - battle score, elemental effects, mobile-safe impact animations */
+/* 한자 탐험대 PWA v2.1.2 - battle rules preserved, projectile timing synced to 12 attack frames */
 'use strict';
 const DRAGONS={
  fire:{name:'화루',kind:'불',hanja:['火','炎','焱'],forms:['꼬마 불꽃룡','붉은 날개룡','화염 수호룡']},
@@ -212,7 +212,7 @@ function playAttackMotion(dialog,correct,element,tier){
       {transform:'translateX(7px) scale(1.04)',filter:'brightness(1.3)'},
       {transform:'translateX(0) scale(1)',filter:'brightness(1)'}
     ],{duration:430,easing:'ease-out'});
-    attackTimer=setTimeout(finish,480);
+    attackTimer=setTimeout(finish,650);
   };
   if(!correct){attackTimer=setTimeout(finish,320);return;}
   const start=async()=>{
@@ -223,7 +223,7 @@ function playAttackMotion(dialog,correct,element,tier){
     // Compute the flight path from the actual dragon sprite to the actual opponent
     // so the impact lands correctly on narrow Android screens and larger tablets.
     const stageRect=stage.getBoundingClientRect();
-    const dragonImage=dragon?.querySelector('img');
+    const dragonImage=dragon?.querySelector('.sprite-holder')||dragon?.querySelector('img');
     const enemyImage=enemy?.querySelector('img');
     const origin=dragonImage?.getBoundingClientRect();
     const target=enemyImage?.getBoundingClientRect();
@@ -264,9 +264,9 @@ function playAttackMotion(dialog,correct,element,tier){
     projectile.classList.add('css-flight');
     attackTimer=setTimeout(hit,1500);
   };
-  setTimeout(()=>{if(serial===attackSerial)start().catch(()=>{if(serial===attackSerial)hit();});},220);
+  setTimeout(()=>{if(serial===attackSerial)start().catch(()=>{if(serial===attackSerial)hit();});},510);
   // Android WebView may skip animation finish after an interruption.
-  setTimeout(()=>{if(serial===attackSerial&&dialog.open&&!impacted)hit();},2400);
+  setTimeout(()=>{if(serial===attackSerial&&dialog.open&&!impacted)hit();},3600);
 }
 function openAttackDialog({correct,used,skill,enemy,remainingHP,answer,points=25,special='',combo=0}){
   stopAttackMotion();
