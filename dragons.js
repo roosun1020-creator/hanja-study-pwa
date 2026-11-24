@@ -21,6 +21,7 @@ const MONSTERS={
 const dragonArt=(dragon,stage)=>`./assets/dragons/${dragon}_${stage}.webp`;
 const monsterArt=id=>`./assets/monsters/${id}.webp`;
 const effectArt=(dragon,idx)=>`./assets/effects/${dragon}_${idx+1}.webp`;
+const spriteAttrs=(key,stage,mode='idle')=>`data-sprite-dragon="${key}" data-sprite-stage="${stage}" data-sprite-state="${mode}"`;
 let attackTimer=null, attackMotion=null, attackSerial=0;
 function completedUnits(){const learned=new Set(state.progress.learned);return Array.from({length:20},(_,i)=>newUnitChars(i+1)).filter(chars=>chars.every(c=>learned.has(c))).length;}
 function stageAt(units,wins){return units>=15&&wins>=3?3:units>=5&&wins>=1?2:1;}
@@ -79,14 +80,14 @@ function dragonOptions(game,stage){
   return `<div class="dragon-picker">${Object.entries(DRAGONS).map(([key,d])=>{
     const owned=game.owned.includes(key),active=game.active===key;
     return `<button data-action="dragon-select" data-value="${key}" ${owned&&active?'disabled':''} ${!owned?'disabled':''} class="${active?'active':''}" aria-label="${d.name}${owned?' 선택':' 잠김'}">
-      <img src="${dragonArt(key,owned?stage:1)}" alt="${d.name}" class="${owned?'':'locked'}" loading="lazy"><strong>${d.name}</strong><small>${owned?(active?'선택 중 ✓':'선택하기'):'🔒 아직 해금 전'}</small></button>`;
+      <img src="${dragonArt(key,owned?stage:1)}" ${spriteAttrs(key,owned?stage:1)} alt="${d.name}" class="${owned?'':'locked'}" loading="lazy"><strong>${d.name}</strong><small>${owned?(active?'선택 중 ✓':'선택하기'):'🔒 아직 해금 전'}</small></button>`;
   }).join('')}</div>`;
 }
 function renderDragons(){
   const {game,units,wins,stage}=gameInfo(),battle=state.ui.battle;
   if(!game.starter){
     return panel('🐉 드래곤 가디언즈',`<p class="lead">한자의 힘으로 성장하는 드래곤 중 첫 친구를 골라 주세요! 다른 드래곤은 10·20단원에 얻을 수 있어요.</p>
-      <div class="dragon-picker">${Object.entries(DRAGONS).map(([key,d])=>`<button data-action="dragon-starter" data-value="${key}"><img src="${dragonArt(key,1)}" alt="${d.name}"><strong>${d.name}</strong><small>${d.hanja[0]} · ${d.kind} 드래곤</small></button>`).join('')}</div>`);
+      <div class="dragon-picker">${Object.entries(DRAGONS).map(([key,d])=>`<button data-action="dragon-starter" data-value="${key}"><img src="${dragonArt(key,1)}" ${spriteAttrs(key,1)} alt="${d.name}"><strong>${d.name}</strong><small>${d.hanja[0]} · ${d.kind} 드래곤</small></button>`).join('')}</div>`);
   }
   const current=game.active,d=DRAGONS[current],skills=unlockedSkills(current,units,stage);
   if(!battle){
@@ -95,7 +96,7 @@ function renderDragons(){
     const scope=state.ui.dragonMode==='unit'?`신규 ${state.ui.dragonUnit}단원`:state.ui.dragonScope;
     const canStart=battlePool(scope).length>=5;
     return panel('🐉 드래곤 가디언즈',`<p class="lead">함께 모험할 드래곤을 선택해 주세요.</p>${dragonOptions(game,stage)}
-      <div class="dragon-hero-info"><img src="${dragonArt(current,stage)}" alt="${d.name}"><div><strong>${d.name} · ${d.forms[stage-1]}</strong><div class="dragon-hanja">${d.hanja[stage-1]}</div><small>드래곤 레벨 ${1+Math.floor(game.xp/60)} · ${d.kind} 속성</small></div></div>
+      <div class="dragon-hero-info"><img src="${dragonArt(current,stage)}" ${spriteAttrs(current,stage,'idle')} alt="${d.name}"><div><strong>${d.name} · ${d.forms[stage-1]}</strong><div class="dragon-hanja">${d.hanja[stage-1]}</div><small>드래곤 레벨 ${1+Math.floor(game.xp/60)} · ${d.kind} 속성</small></div></div>
       <div class="stats-grid">${stat('📖',units+'/20','학습 완료 단원')}${stat('🏆',wins+'회','서로 다른 배틀 승리')}${stat('⚡',skills.filter(s=>s.available).length+'/5','배운 기술')}${stat('💎',game.xp+' XP','드래곤 경험치')}</div>
       ${notice(stage===3?'✨ 최종 진화 완료!':stage===2?'2단계 성장 드래곤! 최종 진화는 15단원과 3회 승리 후 가능해요.':'첫 진화는 신규 단원 5개 완료 + 서로 다른 배틀 1회 승리예요.')}
       <h3>✨ 기술 도감</h3><div class="skills-grid">${skills.map(s=>`<button title="${s.available?`전투 점수 +${s.index*4} 보너스`:s.units+`단원 · `+s.stage+`단계 필요`}" ${s.available?'':'disabled'}><img src="${effectArt(current,s.index)}" alt="${s.name}"><span>${s.available?'':'🔒 '}${s.name}</span></button>`).join('')}</div>
@@ -109,7 +110,7 @@ function renderDragons(){
     const won=battle.correct>=4;
     const bossUnit=Number(battle.scope.match(/^신규 (5|10|15|20)단원$/)?.[1]||0);
     const bossTitle=bossUnit?({5:'새싹의 숲',10:'반짝이는 호수',15:'불꽃 산맥',20:'수호자의 성'}[bossUnit]):'';
-    return panel('🏅 드래곤 배틀 결과',`<div class="dragon-hero-info"><img src="${dragonArt(current,stage)}" alt="${d.name}"><div><h2>${won?'🎉 승리!':'🌱 다시 도전해요!'}</h2><p>${battle.questions.length}문제 중 ${battle.correct}문제 정답</p><div class="battle-final-score">${battleStarLabel(battle.correct)} · 전투 점수 ${battle.score||0}점</div><p class="battle-combo-note">최대 연속 정답 ${battle.maxCombo||0}개 · 정답 수가 승리를 결정해요.</p>${battle.winReward?'첫 승리 경험치 +30XP!':won?'이미 첫 승리 보상을 받았어요.':'틀린 한자를 복습하면 더 강해져요.'}${won&&bossUnit?`<p class="boss-victory">🏅 ${bossTitle} 수호자 격파! 모험 지도에 메달이 기록됐어요.</p>`:''}</div></div>
+    return panel('🏅 드래곤 배틀 결과',`<div class="dragon-hero-info"><img src="${dragonArt(current,stage)}" ${spriteAttrs(current,stage,won?'victory':'idle')} alt="${d.name}"><div><h2>${won?'🎉 승리!':'🌱 다시 도전해요!'}</h2><p>${battle.questions.length}문제 중 ${battle.correct}문제 정답</p><div class="battle-final-score">${battleStarLabel(battle.correct)} · 전투 점수 ${battle.score||0}점</div><p class="battle-combo-note">최대 연속 정답 ${battle.maxCombo||0}개 · 정답 수가 승리를 결정해요.</p>${battle.winReward?'첫 승리 경험치 +30XP!':won?'이미 첫 승리 보상을 받았어요.':'틀린 한자를 복습하면 더 강해져요.'}${won&&bossUnit?`<p class="boss-victory">🏅 ${bossTitle} 수호자 격파! 모험 지도에 메달이 기록됐어요.</p>`:''}</div></div>
      <button class="button primary full big" data-action="battle-exit">다른 배틀 선택하기</button>`);
   }
   const q=battle.questions[battle.idx],enemy=MONSTERS[battle.enemy]||MONSTERS.slime,hp=Math.max(0,100-25*battle.correct);
@@ -118,7 +119,7 @@ function renderDragons(){
     <div class="card-header"><strong>문제 ${battle.idx+1}/5</strong><span class="mini">맞힌 문제 ${battle.correct}개</span></div>${progressBar(battle.idx,5)}
     <div class="battle-score-strip"><span>✨ 전투점수 <b>${battle.score||0}</b></span><span>🔥 연속 정답 <b>${battle.combo||0}</b></span></div>
     <div class="battle-actors">
-      <div class="battle-actor"><img src="${dragonArt(current,stage)}" alt="드래곤 ${d.name}"><div class="actor-name">${d.name}</div><div class="actor-health">Lv.${1+Math.floor(game.xp/60)}</div></div>
+      <div class="battle-actor"><img src="${dragonArt(current,stage)}" ${spriteAttrs(current,stage)} alt="드래곤 ${d.name}"><div class="actor-name">${d.name}</div><div class="actor-health">Lv.${1+Math.floor(game.xp/60)}</div></div>
       <div class="battle-actor"><img src="${monsterArt(battle.enemy)}" alt="몬스터 ${enemy.name}"><div class="actor-name">${enemy.name}</div><div class="actor-health">HP ${hp}/100</div><div class="healthbar"><i style="width:${hp}%"></i></div></div>
     </div>
     ${battle.answered?'':`<div class="small-label">⚡ 기술 선택</div><div class="skills-grid">${skills.filter(s=>s.available).map(s=>`<button data-action="battle-skill" data-value="${s.index}" class="${battle.moveIndex===s.index?'active':''}" title="${s.name}: 정답 시 전투점수 +${s.index*4} 보너스" aria-pressed="${battle.moveIndex===s.index}"><img src="${effectArt(current,s.index)}" alt="${s.name}"><span>${s.name}</span><small>+${s.index*4}점</small></button>`).join('')}</div>`}
@@ -263,7 +264,7 @@ function playAttackMotion(dialog,correct,element,tier){
     projectile.classList.add('css-flight');
     attackTimer=setTimeout(hit,1500);
   };
-  start().catch(()=>{if(serial===attackSerial)hit();});
+  setTimeout(()=>{if(serial===attackSerial)start().catch(()=>{if(serial===attackSerial)hit();});},220);
   // Android WebView may skip animation finish after an interruption.
   setTimeout(()=>{if(serial===attackSerial&&dialog.open&&!impacted)hit();},2400);
 }
@@ -278,7 +279,7 @@ function openAttackDialog({correct,used,skill,enemy,remainingHP,answer,points=25
   el.innerHTML=`<h2 class="attack-heading">⚔️ 드래곤의 공격!</h2>
     <div class="attack-stage" data-element="${elementClass}" data-tier="${tier}">
       <div class="attack-title">${htmlEscape(d.name)} · ${htmlEscape(move)}!</div>
-      <div class="figures"><div class="unit attack-dragon"><img src="${dragonArt(used,stage)}" alt="${d.name}"><span>${d.name}</span></div>
+      <div class="figures"><div class="unit attack-dragon"><img src="${dragonArt(used,stage)}" ${spriteAttrs(used,stage,'attack')} alt="${d.name}"><span>${d.name}</span></div>
         <div class="unit enemy-hit"><img src="${monsterArt(enemy)}" alt="${m.name}"><span class="enemy-name">${htmlEscape(m.name)}</span><span class="enemy-hp">HP ${remainingHP}/100</span></div></div>
       ${correct?`<img class="projectile" src="${effectArt(used,skill)}" alt="기술 ${htmlEscape(move)}가 몬스터에게 날아갑니다">
         <div class="attack-impact" aria-hidden="true"><div class="impact-ring"></div><div class="impact-ring second"></div>${particles}</div>
@@ -287,6 +288,8 @@ function openAttackDialog({correct,used,skill,enemy,remainingHP,answer,points=25
     <div class="attack-result" id="attack-summary">${correct?`✨ 공격 성공! <b>${htmlEscape(m.name)}</b> HP -25<br><span class="attack-points">전투 점수 +${points}점 ${special?htmlEscape(special):combo>=2?'🔥 '+combo+'연속 정답!':''}</span>`:'📖 아쉬워요! 정답은 '+htmlEscape(answer)+'입니다.'}</div>
     <div class="actions equal"><button class="secondary" id="attack-repeat">▶ 다시 보기</button><button class="primary" id="attack-close">✅ 확인</button></div>`;
   try{if(!el.open)el.showModal();}catch{el.setAttribute('open','');}
+  window.HanjaSprites?.mount(el);
+  window.HanjaSprites?.play(el.querySelector('.attack-dragon'),'attack');
   playAttackMotion(el,correct,elementClass,tier);
   $('attack-repeat')?.addEventListener('click',()=>openAttackDialog({correct,used,skill,enemy,remainingHP,answer,points,special,combo}));
   $('attack-close')?.addEventListener('click',()=>{stopAttackMotion();if(typeof el.close==='function')el.close();else el.removeAttribute('open');});
