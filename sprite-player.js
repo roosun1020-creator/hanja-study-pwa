@@ -1,4 +1,4 @@
-/* 한자 탐험대 PWA v2.1.2 — 실제 추가 이미지 프레임 재생기
+/* 한자 탐험대 PWA v2.1.3 — 실제 추가 이미지 프레임 재생기
  * 아기 드래곤 3종 × (대기 8 / 공격 12 / 승리 8) 프레임.
  * 기존 학습·전투 판정·저장 로직을 수정하지 않습니다.
  */
@@ -164,7 +164,7 @@
       if (!document.hidden) schedule();
     });
   }
-  window.HanjaSprites = { mount, play, version: '2.1.2', modes: MODES };
+  window.HanjaSprites = { mount, play, version: '2.1.3', modes: MODES };
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', setup, { once: true });
   } else setup();
