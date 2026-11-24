@@ -73,3 +73,22 @@
 @media(max-width:350px){.menu button span{font-size:10px}.skills-grid span{font-size:9px}.write-char-grid button{font-size:30px}}
 
 .attack-stage .unit span.enemy-name,.attack-stage .unit span.enemy-hp{display:block;max-width:100%;line-height:1.2;padding:1px 2px;font-size:clamp(11px,3vw,14px)}
+
+/* PWA v2.0.2.2: no double-font tracing, explicit tool selection */
+.stroke-font-guide{display:grid}
+.stroke-font-guide[style*="display: none"]{display:none!important}
+.stroke-toolbar button.active{background:#7956bf;color:white;border-color:#623eaa;box-shadow:0 3px 0 #52378a}
+.stroke-toolbar button:not(.active){background:white;color:#5e488a;border-color:#ddd0ee;box-shadow:none}
+.stroke-toolbar button.active[aria-pressed="true"]{outline:2px solid #e1d3fa;outline-offset:2px}
+/* Keep the battle range completely separate from the start button. */
+.battle-scope-options{margin-bottom:22px;row-gap:12px;clear:both}
+.battle-start-button{display:flex;position:relative;margin-top:18px!important;margin-bottom:18px!important;clear:both;min-height:65px}
+/* JS controls the actual flight; the CSS animation is used only for old devices. */
+.attack-stage .projectile{opacity:0;animation:none;will-change:transform,opacity;backface-visibility:hidden}
+.attack-stage .projectile.css-flight{opacity:1;animation:fly-across 1.5s ease-in-out forwards}
+.attack-stage .enemy-hit{animation:none}
+@media(max-width:520px){.battle-scope-options{margin-bottom:26px}.battle-start-button{margin-top:20px!important}}
+@media(prefers-reduced-motion:reduce){
+ /* Attack only runs after an explicit tap, not as an automatic decorative effect. */
+ .attack-stage .projectile.css-flight{animation-duration:1.5s!important}
+}

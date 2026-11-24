@@ -20,7 +20,7 @@ const MONSTERS={
 const dragonArt=(dragon,stage)=>`./assets/dragons/${dragon}_${stage}.webp`;
 const monsterArt=id=>`./assets/monsters/${id}.webp`;
 const effectArt=(dragon,idx)=>`./assets/effects/${dragon}_${idx+1}.webp`;
-let attackTimer=null;
+let attackTimer=null, attackMotion=null, attackSerial=0;
 function completedUnits(){const learned=new Set(state.progress.learned);return Array.from({length:20},(_,i)=>newUnitChars(i+1)).filter(chars=>chars.every(c=>learned.has(c))).length;}
 function stageAt(units,wins){return units>=15&&wins>=3?3:units>=5&&wins>=1?2:1;}
 function gameInfo(){const game=state.progress.game,units=completedUnits();let wins=game.won_battles.length;
@@ -71,8 +71,8 @@ function renderDragons(){
   }
   const current=game.active,d=DRAGONS[current],skills=unlockedSkills(current,units,stage);
   if(!battle){
-    const options=state.ui.dragonMode==='unit'?`<div class="unit-grid">${Array.from({length:20},(_,i)=>pickButton('dragon-unit',String(i+1),`${i+1}단원`,state.ui.dragonUnit===i+1)).join('')}</div>`:
-      `<div class="pills">${pickButton('dragon-scope','8급 복습','🏅 8급 복습',state.ui.dragonScope==='8급 복습')}${pickButton('dragon-scope','학습 완료 한자','📖 학습 완료',state.ui.dragonScope==='학습 완료 한자')}</div>`;
+    const options=state.ui.dragonMode==='unit'?`<div class="unit-grid battle-scope-options">${Array.from({length:20},(_,i)=>pickButton('dragon-unit',String(i+1),`${i+1}단원`,state.ui.dragonUnit===i+1)).join('')}</div>`:
+      `<div class="pills battle-scope-options">${pickButton('dragon-scope','8급 복습','🏅 8급 복습',state.ui.dragonScope==='8급 복습')}${pickButton('dragon-scope','학습 완료 한자','📖 학습 완료',state.ui.dragonScope==='학습 완료 한자')}</div>`;
     const scope=state.ui.dragonMode==='unit'?`신규 ${state.ui.dragonUnit}단원`:state.ui.dragonScope;
     const canStart=battlePool(scope).length>=5;
     return panel('🐉 드래곤 가디언즈',`<p class="lead">함께 모험할 드래곤을 선택해 주세요.</p>${dragonOptions(game,stage)}
@@ -82,7 +82,7 @@ function renderDragons(){
       <h3>✨ 기술 도감</h3><div class="skills-grid">${skills.map(s=>`<button ${s.available?'':'disabled'} title="${s.available?'사용 가능':`${s.units}단원 · ${s.stage}단계 필요`}"><img src="${effectArt(current,s.index)}" alt="${s.name}"><span>${s.available?'':'🔒 '}${s.name}</span></button>`).join('')}</div>
       <h3>⚔️ 배틀 범위를 선택하세요</h3><div class="pills">${pickButton('dragon-mode','basic','🛡️ 기본 모험',state.ui.dragonMode==='basic')}${pickButton('dragon-mode','unit','📚 단원별 모험',state.ui.dragonMode==='unit')}</div>
       <div class="small-label">도전할 한자 범위</div>${options}
-      <button class="button primary full big" data-action="battle-start" ${canStart?'':'disabled'}>⚔️ 드래곤 배틀 시작!</button>
+      <button class="button primary full big battle-start-button" data-action="battle-start" ${canStart?'':'disabled'}>⚔️ 드래곤 배틀 시작!</button>
       ${!canStart?`<p class="note">학습 완료 한자는 다섯 글자 이상 배운 뒤 선택할 수 있습니다.</p>`:''}<p class="note">다섯 문제 중 네 문제 이상 정답이면 승리. 각 배틀 범위 첫 승리 시 드래곤 경험치 +30XP!</p>`);
   }
   if(battle.idx>=5){
@@ -147,21 +147,70 @@ function replayBattleAttack(){
   const used=state.progress.game.active;
   openAttackDialog({correct:b.lastCorrect,used,skill:b.moveIndex,enemy:b.enemy,remainingHP:Math.max(0,100-25*b.correct),answer:b.questions[b.idx].answer});
 }
+function stopAttackMotion(){
+  attackSerial++;
+  if(attackTimer){clearTimeout(attackTimer);attackTimer=null;}
+  if(attackMotion){try{attackMotion.cancel();}catch{}attackMotion=null;}
+}
+function playAttackMotion(dialog,correct){
+  const serial=attackSerial;
+  const projectile=dialog.querySelector('.projectile');
+  const enemy=dialog.querySelector('.enemy-hit');
+  const result=dialog.querySelector('#attack-summary');
+  const finish=()=>{
+    if(serial!==attackSerial||!dialog.open)return;
+    result?.classList.add('visible');
+  };
+  if(!correct){attackTimer=setTimeout(finish,350);return;}
+  const start=async()=>{
+    // Decode first so the animation never completes before the first image paint on a phone.
+    try{if(projectile?.decode)await Promise.race([projectile.decode().catch(()=>{}),new Promise(r=>setTimeout(r,500))]);}catch{}
+    if(serial!==attackSerial||!dialog.open||!projectile)return;
+    await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+    if(serial!==attackSerial||!dialog.open)return;
+    const stage=dialog.querySelector('.attack-stage');
+    const distance=Math.max(75,(stage?.clientWidth||300)*.54);
+    if(typeof projectile.animate==='function'){
+      try{
+        projectile.style.opacity='1';
+        attackMotion=projectile.animate([
+          {transform:'translate3d(0,0,0) scale(.65)',opacity:0,offset:0},
+          {transform:'translate3d(0,0,0) scale(.78)',opacity:1,offset:.13},
+          {transform:`translate3d(${distance*.84}px,0,0) scale(1.08)`,opacity:1,offset:.85},
+          {transform:`translate3d(${distance}px,0,0) scale(1.22)`,opacity:0,offset:1}
+        ],{duration:1500,easing:'ease-in-out',fill:'forwards'});
+        attackMotion.onfinish=()=>{
+          if(serial!==attackSerial||!dialog.open)return;
+          if(enemy?.animate)enemy.animate([
+            {transform:'translateX(0)'},{transform:'translateX(-8px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}
+          ],{duration:350,easing:'ease-in-out'});
+          attackTimer=setTimeout(finish,350);
+        };
+        return;
+      }catch(error){console.warn('attack animation fallback',error);}
+    }
+    // Fallback for older WebViews; explicit user-requested attack still runs with reduced motion.
+    projectile.classList.add('css-flight');
+    attackTimer=setTimeout(finish,1900);
+  };
+  start().catch(()=>{if(serial===attackSerial)finish();});
+  // If decoding stalls or an Android WebView skips finish, results are still reachable.
+  setTimeout(()=>{if(serial===attackSerial&&dialog.open&&result&&!result.classList.contains('visible'))finish();},2600);
+}
 function openAttackDialog({correct,used,skill,enemy,remainingHP,answer}){
-  if(attackTimer)clearTimeout(attackTimer);
+  stopAttackMotion();
   const el=$('attack-dialog');if(!el||!DRAGONS[used]||!MONSTERS[enemy])return;
-  const {game,units,wins,stage}=gameInfo(),d=DRAGONS[used],m=MONSTERS[enemy],move=SKILLS[used][skill][0];
+  const {stage}=gameInfo(),d=DRAGONS[used],m=MONSTERS[enemy],move=SKILLS[used][skill][0];
   el.innerHTML=`<h2 style="margin:0 0 10px">⚔️ 드래곤의 공격!</h2>
     <div class="attack-stage"><div class="attack-title">${htmlEscape(d.name)} · ${htmlEscape(move)}!</div>
       <div class="figures"><div class="unit"><img src="${dragonArt(used,stage)}" alt="${d.name}"><span>${d.name}</span></div>
         <div class="unit enemy-hit"><img src="${monsterArt(enemy)}" alt="${m.name}"><span class="enemy-name">${m.name}</span><span class="enemy-hp">HP ${remainingHP}/100</span></div></div>
       ${correct?`<img class="projectile" src="${effectArt(used,skill)}" alt="기술 ${htmlEscape(move)}가 몬스터에게 날아갑니다">`:''}
-    </div><div class="attack-result" id="attack-summary">${correct?'✨ 공격 성공! '+m.name+'에게 25 피해!':'📖 아쉬워요! 정답은 '+htmlEscape(answer)+'입니다.'}</div>
+    </div><div class="attack-result" id="attack-summary">${correct?'✨ 공격 성공! '+htmlEscape(m.name)+'에게 25 피해!':'📖 아쉬워요! 정답은 '+htmlEscape(answer)+'입니다.'}</div>
     <div class="actions equal"><button class="secondary" id="attack-repeat">▶ 다시 보기</button><button class="primary" id="attack-close">✅ 확인</button></div>`;
   try{if(!el.open)el.showModal();}catch{el.setAttribute('open','');}
-  const result=$('attack-summary');
-  attackTimer=setTimeout(()=>{result?.classList.add('visible');},correct?1650:400);
+  playAttackMotion(el,correct);
   $('attack-repeat')?.addEventListener('click',()=>openAttackDialog({correct,used,skill,enemy,remainingHP,answer}));
-  $('attack-close')?.addEventListener('click',()=>{if(attackTimer)clearTimeout(attackTimer);el.close();});
-  el.addEventListener('cancel',()=>{if(attackTimer)clearTimeout(attackTimer);},{once:true});
+  $('attack-close')?.addEventListener('click',()=>{stopAttackMotion();if(typeof el.close==='function')el.close();else el.removeAttribute('open');});
+  el.addEventListener('cancel',stopAttackMotion,{once:true});
 }

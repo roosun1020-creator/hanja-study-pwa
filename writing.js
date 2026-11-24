@@ -46,9 +46,9 @@ function renderWriting(){
       </div>
       <div class="stroke-options"><button data-action="write-tool-guide" class="active" id="write-guide-btn">🧩 밑그림 켜짐</button><button data-action="write-tool-numbers" id="write-numbers-btn">🔢 획 번호</button></div>
       <div class="stroke-toolbar">
-        <button data-action="write-tool-animate" id="write-animate">▶ 획순 보기</button>
-        <button data-action="write-tool-quiz" id="write-quiz">✏️ 순서대로 쓰기</button>
-        <button data-action="write-tool-freehand" id="write-freehand" class="primary">🖍️ 자유쓰기</button>
+        <button data-action="write-tool-animate" id="write-animate" aria-pressed="false">▶ 획순 보기</button>
+        <button data-action="write-tool-quiz" id="write-quiz" aria-pressed="false">✏️ 순서대로 쓰기</button>
+        <button data-action="write-tool-freehand" id="write-freehand" class="active" aria-pressed="true">🖍️ 자유쓰기</button>
         <button data-action="write-tool-clear" id="write-clear">🔄 다시 쓰기</button>
       </div>
       <div id="stroke-status" class="stroke-status" role="status">한자 쓰기판을 준비하고 있어요…</div>
@@ -101,10 +101,31 @@ function initializeFreehand(board,char){
   canvas.onpointermove=ev=>{if(!drawing)return;const p=pos(ev);ctx.lineTo(p.x,p.y);ctx.stroke();ev.preventDefault();};
   canvas.onpointerup=canvas.onpointercancel=()=>{drawing=false;};
   return {
-    type:'freehand',toggleGuide(){showGuide=!showGuide;guide.style.visibility=showGuide?'visible':'hidden';return showGuide;},
+    type:'freehand',mode:'freehand',showGuide:true,sequence:0,
+    toggleGuide(){this.showGuide=!this.showGuide;updateWritingOutline(this);return this.showGuide;},
     clear(){ctx.clearRect(0,0,canvas.width,canvas.height);hasInk=false;},
     hasInk:()=>hasInk, char
   };
+}
+function updateWritingMode(rt, mode){
+  if(!rt)return;
+  rt.mode=mode;
+  for(const [kind,id] of Object.entries({animate:'write-animate',quiz:'write-quiz',freehand:'write-freehand'})){
+    const btn=$(id);if(!btn)continue;
+    const active=kind===mode;
+    btn.classList.toggle('active',active);
+    btn.setAttribute('aria-pressed',active?'true':'false');
+  }
+}
+function updateWritingOutline(rt){
+  // Never overlay two fonts: when HanziWriter is available, its SVG is the only guide.
+  const guide=$('stroke-guide');
+  const usingVector=!!rt?.vectorReady;
+  if(guide)guide.style.display=usingVector?'none':rt?.showGuide===false?'none':'grid';
+  if(usingVector&&rt.writer){
+    const update=rt.showGuide?rt.writer.showOutline:rt.writer.hideOutline;
+    if(typeof update==='function')Promise.resolve(update.call(rt.writer,{duration:0})).catch(()=>{});
+  }
 }
 function positionStrokeNumbers(medians){
   const size=360,scale=HanziWriter.getScalingTransform(size,size,22);
@@ -125,7 +146,7 @@ async function mountWritingBoard(){
   writingStatus('🖍️ 자유쓰기를 할 수 있어요. 획순 데이터를 확인 중…');
   const available=await loadHanziWriter();
   if(ticket!==writingMountSerial||state.ui.page!=='writing'||writingSelectedChar()!==char)return;
-  if(!available){writingStatus('🖍️ 오프라인 자유쓰기 준비 완료! 획순 기능은 추가 자료가 필요해요.');return;}
+  if(!available){updateWritingOutline(rt);writingStatus('🖍️ 오프라인 자유쓰기 준비 완료! 획순 기능은 추가 자료가 필요해요.');return;}
   // First use local data for offline; online fallback only if local file is missing.
   const strokeDataLoader=(ch,onComplete,onError)=>{
     fetch('./strokes/'+encodeURIComponent(ch)+'.json').then(x=>{if(!x.ok)throw Error('not bundled');return x.json();})
@@ -136,42 +157,76 @@ async function mountWritingBoard(){
   const dim=Math.round(board.clientWidth)-8;
   const writer=HanziWriter.create('stroke-target',char,{width:dim,height:dim,padding:18,showCharacter:false,showOutline:true,strokeAnimationSpeed:.55,delayBetweenStrokes:360,drawingWidth:36,
     charDataLoader:strokeDataLoader,
-    onLoadCharDataSuccess(data){strokeMedians=data.medians||[]; if(writingRuntime?.char===char){rt.positions=positionStrokeNumbers(strokeMedians);$('stroke-canvas').style.pointerEvents='none';writingStatus('✅ 획순 연습 준비 완료! ▶ 획순 보기 또는 ✏️ 순서대로 쓰기를 눌러 보세요.');}},
-    onLoadCharDataError(){if(writingRuntime?.char===char)writingStatus('🖍️ 한자 획순 자료를 불러오지 못해 자유쓰기 모드로 사용할 수 있어요.');}
+    onLoadCharDataSuccess(data){strokeMedians=data.medians||[]; if(ticket===writingMountSerial&&writingRuntime===rt){rt.positions=positionStrokeNumbers(strokeMedians);rt.vectorReady=true;updateWritingOutline(rt);$('stroke-canvas').style.pointerEvents=rt.mode==='freehand'?'auto':'none';writingStatus('✅ 획순 자료 준비 완료! 밑그림은 획순 원본과 동일한 모양으로 표시돼요.');}},
+    onLoadCharDataError(){if(ticket===writingMountSerial&&writingRuntime===rt){rt.vectorReady=false;updateWritingOutline(rt);writingStatus('🖍️ 이 한자는 획순 자료가 없어 자유쓰기로 연습할 수 있어요.');}}
   });
   rt.writer=writer;
   rt.showNumbers=false;
+  updateWritingOutline(rt);
 }
 async function onWritingToolClick(action){
-  if(!writingRuntime)return;
   const rt=writingRuntime;
+  if(!rt||rt.char!==writingSelectedChar())return;
   if(action==='write-tool-guide'){
-    const visible=rt.toggleGuide();$('write-guide-btn').classList.toggle('active',visible);$('write-guide-btn').textContent=visible?'🧩 밑그림 켜짐':'🧩 밑그림 꺼짐';return;
+    const visible=rt.toggleGuide();
+    $('write-guide-btn')?.classList.toggle('active',visible);
+    const b=$('write-guide-btn');if(b)b.textContent=visible?'🧩 밑그림 켜짐':'🧩 밑그림 꺼짐';
+    return;
   }
   if(action==='write-tool-numbers'){
-    rt.showNumbers=!rt.showNumbers;showStrokeNumbers(rt.showNumbers?(rt.positions||[]):[],rt.positions?.length||0);
-    $('write-numbers-btn').classList.toggle('active',rt.showNumbers);return;
+    rt.showNumbers=!rt.showNumbers;
+    showStrokeNumbers(rt.showNumbers?(rt.positions||[]):[],rt.positions?.length||0);
+    $('write-numbers-btn')?.classList.toggle('active',rt.showNumbers);
+    return;
   }
   if(action==='write-tool-clear'){
-    rt.clear();if(rt.writer){rt.writer.cancelQuiz();await rt.writer.hideCharacter({duration:0});}
+    ++rt.sequence;
+    rt.clear();
+    if(rt.writer){rt.writer.cancelQuiz();await rt.writer.hideCharacter({duration:0});}
+    showStrokeNumbers(rt.showNumbers?(rt.positions||[]):[],rt.positions?.length||0);
     writingStatus('다시 연습해 보세요!');return;
   }
   if(action==='write-tool-freehand'){
-    if(rt.writer){rt.writer.cancelQuiz();await rt.writer.hideCharacter({duration:0});$('stroke-canvas').style.pointerEvents='auto';}
+    ++rt.sequence;
+    updateWritingMode(rt,'freehand');
+    if(rt.writer){rt.writer.cancelQuiz();await rt.writer.hideCharacter({duration:0});}
+    const canvas=$('stroke-canvas');if(canvas)canvas.style.pointerEvents='auto';
     writingStatus('🖍️ 자유쓰기 모드! 손가락으로 따라 써 보세요.');return;
   }
-  if(!rt.writer){writingStatus('획순 연습 자료가 아직 없습니다. 지금은 자유쓰기와 연습 완료 기능을 사용해 주세요.');return;}
-  if(action==='write-tool-animate'){
-    try{
-      $('stroke-canvas').style.pointerEvents='none';rt.clear();rt.writer.cancelQuiz();await rt.writer.hideCharacter({duration:0});
-      if(rt.positions?.length){showStrokeNumbers([],0);}
-      if(rt.showNumbers&&rt.positions?.length){for(let i=0;i<rt.positions.length;i++){showStrokeNumbers(rt.positions,i+1);await rt.writer.animateStroke(i);}}
-      else await rt.writer.animateCharacter();
-      writingStatus('✨ 획순을 확인했어요. 이제 직접 써 보세요!');
-    }catch(err){writingStatus('획순 재생을 다시 시도해 주세요.');}
+  if(!rt.writer||!rt.vectorReady){
+    writingStatus('이 한자의 획순 자료가 아직 없습니다. 자유쓰기를 이용해 주세요.');return;
   }
   if(action==='write-tool-quiz'){
-    rt.clear();$('stroke-canvas').style.pointerEvents='none';rt.writer.cancelQuiz();writingStatus('✏️ 정해진 획순으로 쓰세요. 중국식 획순 데이터를 사용합니다.');
-    rt.writer.quiz({onComplete:()=>{writingStatus('🎉 획순 쓰기 성공! 아래 연습 완료 버튼도 눌러 기록하세요.');}});
+    ++rt.sequence;
+    updateWritingMode(rt,'quiz');
+    rt.clear();
+    const canvas=$('stroke-canvas');if(canvas)canvas.style.pointerEvents='none';
+    rt.writer.cancelQuiz();
+    await rt.writer.hideCharacter({duration:0});
+    writingStatus('✏️ 순서대로 쓰기 모드! 획을 순서대로 그려 보세요.');
+    rt.writer.quiz({onComplete:()=>{if(writingRuntime===rt&&rt.mode==='quiz')writingStatus('🎉 획순 쓰기 성공! 아래 연습 완료 버튼도 눌러 기록하세요.');}});
+    return;
+  }
+  if(action==='write-tool-animate'){
+    const serial=++rt.sequence;
+    updateWritingMode(rt,'animate');
+    const canvas=$('stroke-canvas');if(canvas)canvas.style.pointerEvents='none';
+    rt.clear();rt.writer.cancelQuiz();
+    rt.showNumbers=true;
+    $('write-numbers-btn')?.classList.add('active');
+    showStrokeNumbers([],0);
+    writingStatus('▶ 획순 재생 중… 번호를 보면서 따라가 보세요!');
+    try{
+      await rt.writer.hideCharacter({duration:0});
+      if(serial!==rt.sequence||writingRuntime!==rt)return;
+      if(rt.positions?.length){
+        for(let i=0;i<rt.positions.length;i++){
+          if(serial!==rt.sequence||writingRuntime!==rt)return;
+          showStrokeNumbers(rt.positions,i+1);
+          await rt.writer.animateStroke(i);
+        }
+      }else await rt.writer.animateCharacter();
+      if(serial===rt.sequence&&writingRuntime===rt)writingStatus('✨ 획순과 번호를 확인했어요. 이제 직접 써 보세요!');
+    }catch(err){if(serial===rt.sequence&&writingRuntime===rt)writingStatus('획순 재생을 다시 시도해 주세요.');}
   }
 }
