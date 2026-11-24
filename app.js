@@ -1,4 +1,4 @@
-/* 한자 탐험대 PWA v2.0.1
+/* 한자 탐험대 PWA v2.0.2
  * Streamlit v1.2.3.8의 150자, 배우기(+2), 퀴즈(+10), 1·3·7일 복습 규칙을 포팅.
  * v2.0.0 IndexedDB 키와 기존 플래시카드 진행 상태를 그대로 사용합니다.
  * 온라인 서버 API, 외부 JS 라이브러리 및 개인정보 전송 없음.
@@ -18,8 +18,8 @@ const QUIZ_SCOPE_LIST=[
   {id:'learned',title:'📚 내가 배운 한자'}
 ];
 const ALT={'金':'성 김','車':'수레 차','洞':'밝을 통','便':'똥오줌 변','食':'먹을 식','韓':'나라 한','漢':'한수 한'};
-const PAGES=['home','learn','quiz','review','cards','records'];
-const PAGE_LABELS={home:'홈',learn:'배우기',quiz:'퀴즈',review:'복습',cards:'한자 카드',records:'기록'};
+const PAGES=['home','learn','quiz','review','writing','dragons','cards','records'];
+const PAGE_LABELS={home:'홈',learn:'배우기',quiz:'퀴즈',review:'복습',writing:'쓰기',dragons:'드래곤',cards:'한자 카드',records:'기록'};
 const htmlEscape=s=>String(s).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 let records=[],recordByChar=new Map(),state=null,dbPromise=null,busy=false;
 function todayKST(){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());}
@@ -31,8 +31,8 @@ function quizPool(scope){return scope==='learned'?(state?.progress?.learned||[])
 const record=ch=>recordByChar.get(ch);
 const fullLabel=row=>row.meaning+' '+row.reading;
 function newDeck(scope,round=1){return {scope,deck:shuffle(pool(scope)),idx:0,revealed:false,round,seen:state?.seen||[]};}
-function freshProgress(){return {learned:[],cards:{},xp:0,active_days:[],game:{starter:null,active:null,owned:[],xp:0,won_battles:[]}};}
-function defaultUI(){return {page:'home',learnSection:'new',learnUnitNew:1,learnGroupNew:0,learnUnitOld:1,learnGroupOld:0,learnIndex:0,quizScope:'all150',quiz:null,resetStep:false};}
+function freshProgress(){return {learned:[],cards:{},xp:0,active_days:[],game:{starter:null,active:null,owned:[],xp:0,won_battles:[]},writing:{practiced:[],attempts:{}}};}
+function defaultUI(){return {page:'home',learnSection:'new',learnUnitNew:1,learnGroupNew:0,learnUnitOld:1,learnGroupOld:0,learnIndex:0,quizScope:'all150',quiz:null,writingMode:'unit',writingGrade:'7급Ⅱ',writingUnit:1,writingPage:0,writingChar:null,dragonMode:'basic',dragonUnit:1,dragonScope:'8급 복습',battle:null,resetStep:false};}
 function stateDeckOK(s){
   if(!s||!SCOPE_LIST.some(o=>o.id===s.scope)||!Array.isArray(s.deck)||!Array.isArray(s.seen)||!Number.isInteger(s.idx))return false;
   const allowed=new Set(pool(s.scope)),all=new Set(records.map(x=>x.char));
@@ -62,6 +62,12 @@ function normalizeProgress(raw){
       xp:Number.isFinite(g.xp)?Math.max(0,Math.floor(g.xp)):0,
       won_battles:Array.isArray(g.won_battles)?g.won_battles.filter(x=>typeof x==='string').slice(0,200):[]};
   }
+  if(raw.writing&&typeof raw.writing==='object'&&!Array.isArray(raw.writing)){
+    p.writing.practiced=Array.isArray(raw.writing.practiced)?[...new Set(raw.writing.practiced.filter(ch=>valid.has(ch)))]:[];
+    if(raw.writing.attempts&&typeof raw.writing.attempts==='object'){
+      for(const [ch,n] of Object.entries(raw.writing.attempts))if(valid.has(ch)&&Number.isFinite(Number(n)))p.writing.attempts[ch]=Math.min(10000,Math.max(0,Math.floor(Number(n))));
+    }
+  }
   return p;
 }
 function normalizeUI(raw,fromV200=false){
@@ -73,6 +79,15 @@ function normalizeUI(raw,fromV200=false){
     if(Number.isInteger(raw[k])&&raw[k]>=lo&&raw[k]<=hi)ui[k]=raw[k];
   }
   if(QUIZ_SCOPE_LIST.some(x=>x.id===raw.quizScope))ui.quizScope=raw.quizScope;
+  if(['unit','learned','all'].includes(raw.writingMode))ui.writingMode=raw.writingMode;
+  if(['8급','7급Ⅱ','7급'].includes(raw.writingGrade))ui.writingGrade=raw.writingGrade;
+  if(Number.isInteger(raw.writingUnit)&&raw.writingUnit>=1&&raw.writingUnit<=10)ui.writingUnit=raw.writingUnit;
+  if(Number.isInteger(raw.writingPage)&&raw.writingPage>=0&&raw.writingPage<=20)ui.writingPage=raw.writingPage;
+  if(typeof raw.writingChar==='string'&&recordByChar.has(raw.writingChar))ui.writingChar=raw.writingChar;
+  if(['basic','unit'].includes(raw.dragonMode))ui.dragonMode=raw.dragonMode;
+  if(Number.isInteger(raw.dragonUnit)&&raw.dragonUnit>=1&&raw.dragonUnit<=20)ui.dragonUnit=raw.dragonUnit;
+  if(typeof raw.dragonScope==='string'&&['8급 복습','학습 완료 한자',...Array.from({length:20},(_,i)=>`신규 ${i+1}단원`)].includes(raw.dragonScope))ui.dragonScope=raw.dragonScope;
+  if(typeof normalizeBattle==='function')ui.battle=normalizeBattle(raw.battle);
   if(raw.quiz&&typeof raw.quiz==='object'&&Array.isArray(raw.quiz.questions)&&raw.quiz.questions.length<=10&&
       raw.quiz.questions.length>0&&Number.isInteger(raw.quiz.idx)&&raw.quiz.idx>=0&&raw.quiz.idx<=raw.quiz.questions.length&&
       raw.quiz.questions.every(q=>q&&recordByChar.has(q.char)&&typeof q.prompt==='string'&&
@@ -142,7 +157,8 @@ function renderHome(){
     ${due.length?notice('🔔 오늘 복습을 기다리는 한자가 '+due.length+'자 있어요!'):notice('🌈 오늘도 새로운 한자 친구들을 만나 볼까요?')}
     ${due.length?'<button class="button full" data-page="review">🧠 오늘의 복습 시작</button>':''}`, 'hero-panel')+
     panel('🌟 오늘의 추천 단원',mission)+
-    panel('🎮 다음에 만날 모험',`<p class="lead">획순 쓰기와 드래곤 배틀는 다음 버전에서 PWA로 옮길 예정이에요. 지금은 기존 Streamlit 앱에서 이용해 주세요.</p>`);
+    panel('🐉 드래곤과 함께하는 모험',`<p class="lead">한자 쓰기 연습으로 손끝을 단련하고, 드래곤과 함께 한자 배틀에 도전해 보세요!</p>
+      <div class="actions equal"><button class="primary" data-page="writing">✍️ 한자 쓰기</button><button class="primary" data-page="dragons">🐉 드래곤 배틀</button></div>`);
 }
 function newUnitChars(unit){return records.filter(r=>r.grade!=='8급').slice((unit-1)*5,unit*5).map(r=>r.char);}
 function oldUnitChars(unit){return records.filter(r=>r.grade==='8급').slice((unit-1)*5,unit*5).map(r=>r.char);}
@@ -200,10 +216,10 @@ function quizScreen(){
     ${progressBar(q.idx,count)}
     ${cur.kind==='char'?'':`<div class="quiz-hanja">${htmlEscape(cur.char)}</div>`}
     <div class="quiz-prompt">${htmlEscape(cur.prompt)}</div>
-    <div class="choice-grid">${options}</div>
-    ${q.answered?`<div class="quiz-result ${correct?'good':'bad'}">${correct?'🎉 정답이에요! +10점':'💡 아쉬워요. 정답: '+htmlEscape(cur.answer)}</div>
+    <div class="choice-grid quiz-choice-grid">${options}</div>
+    <div class="quiz-confirm-area">${q.answered?`<div class="quiz-result ${correct?'good':'bad'}">${correct?'🎉 정답이에요! +10점':'💡 아쉬워요. 정답: '+htmlEscape(cur.answer)}</div>
      <button class="button primary full big" data-action="quiz-next">${q.idx===count-1?'🏆 결과 보기':'다음 문제 →'}</button>`:
-     `<button class="button primary full big" data-action="quiz-confirm" ${q.selected===null?'disabled':''}>정답 확인</button>`}
+     `<button class="button primary full big" data-action="quiz-confirm" ${q.selected===null?'disabled':''}>정답 확인</button>`}</div>
     <button class="button full" style="margin-top:11px" data-action="quiz-abort">현재 퀴즈 종료</button>`);
 }
 function renderQuiz(){
@@ -260,9 +276,10 @@ function render(){
     const on=b.dataset.page===state.ui.page;
     b.classList.toggle('active',on);b.setAttribute('aria-current',on?'page':'false');
   });
-  const renderer={home:renderHome,learn:renderLearning,quiz:renderQuiz,review:renderReview,cards:renderCards,records:renderRecords};
+  const renderer={home:renderHome,learn:renderLearning,quiz:renderQuiz,review:renderReview,writing:renderWriting,dragons:renderDragons,cards:renderCards,records:renderRecords};
   $('page-content').innerHTML=renderer[state.ui.page]();
   $('parent-tools').hidden=state.ui.page!=='records'||$('parent-tools').dataset.open!=='true';
+  if(state.ui.page==='writing'&&typeof mountWritingBoard==='function')mountWritingBoard();
   $('offline-status').textContent=navigator.onLine?'기록은 이 기기에 자동 저장돼요':'📴 오프라인에서도 학습 가능';
 }
 function navigate(page){
@@ -275,6 +292,9 @@ $('page-content').addEventListener('click',e=>{
   const btn=e.target.closest('button[data-page],button[data-action]');if(!btn||btn.disabled||busy)return;
   if(btn.dataset.page){navigate(btn.dataset.page);return;}
   const action=btn.dataset.action,val=btn.dataset.value;
+  if(action.startsWith('write-tool-')){onWritingToolClick(action);return;}
+  if(action==='battle-use'){performBattleAttack();return;}
+  if(action==='battle-replay'){replayBattleAttack();return;}
   if(action==='records-tools'){$('parent-tools').dataset.open=$('parent-tools').hidden?'true':'false';render();return;}
   change(()=>{
     const u=state.ui;
@@ -300,11 +320,15 @@ $('page-content').addEventListener('click',e=>{
       case 'records-reset-open':u.resetStep=true;break;
       case 'records-reset-cancel':u.resetStep=false;break;
       case 'records-reset-confirm':if(u.resetStep){state.progress=freshProgress();state.seen=[];Object.assign(state,newDeck(state.scope,1));u.quiz=null;u.resetStep=false;}break;
-      default:throw new Error('알 수 없는 동작: '+action);
+      default:
+        if(action.startsWith('write-'))handleWritingAction(action,val);
+        else if(action.startsWith('dragon-')||action.startsWith('battle-'))handleDragonAction(action,val);
+        else throw new Error('알 수 없는 동작: '+action);
+    
     }
   },{top:action==='go-lesson'});
 });
-function makeBackup(){return {kind:'hanja-pwa-backup',format:2,exportedAt:new Date().toISOString(),state};}
+function makeBackup(){return {kind:'hanja-pwa-backup',format:3,exportedAt:new Date().toISOString(),state};}
 $('export-json').addEventListener('click',()=>{
   if(!state)return;
   const data=JSON.stringify(makeBackup(),null,2);
@@ -318,7 +342,7 @@ $('import-file').addEventListener('change',async e=>{
   try{
     if(file.size>3000000)throw new Error('백업 파일이 너무 큽니다. 3MB 이하만 지원합니다.');
     const payload=JSON.parse(await file.text());let next;
-    if(payload?.kind==='hanja-pwa-backup'&&(payload.format===1||payload.format===2)&&stateDeckOK(payload.state)){
+    if(payload?.kind==='hanja-pwa-backup'&&[1,2,3].includes(payload.format)&&stateDeckOK(payload.state)){
       next=upgrade(payload.state);
     }else if(payload&&typeof payload==='object'&&payload.progress&&typeof payload.progress==='object'&&
              ('learned' in payload.progress||'cards' in payload.progress)){

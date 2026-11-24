@@ -1,9 +1,27 @@
 {
-  "id":"./",
-  "name":"한자 탐험대 · 드래곤 가디언즈",
-  "short_name":"한자 탐험대",
-  "description":"한자 배우기, 퀴즈, 복습, 카드 · 자동 저장 및 오프라인 PWA",
-  "lang":"ko","start_url":"./","scope":"./","display":"standalone",
-  "background_color":"#f9f6ff","theme_color":"#7856bc","orientation":"portrait-primary",
-  "icons":[{"src":"./icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},{"src":"./icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]
+  "id": "./",
+  "name": "한자 탐험대 · 드래곤 가디언즈",
+  "short_name": "한자 탐험대",
+  "description": "한자 150자, 카드, 배우기, 쓰기, 드래곤 게임과 자동 저장·오프라인 지원",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f9f6ff",
+  "theme_color": "#7856bc",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }
