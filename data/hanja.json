@@ -1,0 +1,902 @@
+[
+  {
+    "char": "一",
+    "meaning": "한",
+    "reading": "일",
+    "grade": "8급"
+  },
+  {
+    "char": "二",
+    "meaning": "두",
+    "reading": "이",
+    "grade": "8급"
+  },
+  {
+    "char": "三",
+    "meaning": "석",
+    "reading": "삼",
+    "grade": "8급"
+  },
+  {
+    "char": "四",
+    "meaning": "넉",
+    "reading": "사",
+    "grade": "8급"
+  },
+  {
+    "char": "五",
+    "meaning": "다섯",
+    "reading": "오",
+    "grade": "8급"
+  },
+  {
+    "char": "六",
+    "meaning": "여섯",
+    "reading": "륙",
+    "grade": "8급"
+  },
+  {
+    "char": "七",
+    "meaning": "일곱",
+    "reading": "칠",
+    "grade": "8급"
+  },
+  {
+    "char": "八",
+    "meaning": "여덟",
+    "reading": "팔",
+    "grade": "8급"
+  },
+  {
+    "char": "九",
+    "meaning": "아홉",
+    "reading": "구",
+    "grade": "8급"
+  },
+  {
+    "char": "十",
+    "meaning": "열",
+    "reading": "십",
+    "grade": "8급"
+  },
+  {
+    "char": "山",
+    "meaning": "메",
+    "reading": "산",
+    "grade": "8급"
+  },
+  {
+    "char": "水",
+    "meaning": "물",
+    "reading": "수",
+    "grade": "8급"
+  },
+  {
+    "char": "火",
+    "meaning": "불",
+    "reading": "화",
+    "grade": "8급"
+  },
+  {
+    "char": "木",
+    "meaning": "나무",
+    "reading": "목",
+    "grade": "8급"
+  },
+  {
+    "char": "金",
+    "meaning": "쇠",
+    "reading": "금",
+    "grade": "8급"
+  },
+  {
+    "char": "土",
+    "meaning": "흙",
+    "reading": "토",
+    "grade": "8급"
+  },
+  {
+    "char": "日",
+    "meaning": "날",
+    "reading": "일",
+    "grade": "8급"
+  },
+  {
+    "char": "月",
+    "meaning": "달",
+    "reading": "월",
+    "grade": "8급"
+  },
+  {
+    "char": "年",
+    "meaning": "해",
+    "reading": "년",
+    "grade": "8급"
+  },
+  {
+    "char": "東",
+    "meaning": "동녘",
+    "reading": "동",
+    "grade": "8급"
+  },
+  {
+    "char": "西",
+    "meaning": "서녘",
+    "reading": "서",
+    "grade": "8급"
+  },
+  {
+    "char": "南",
+    "meaning": "남녘",
+    "reading": "남",
+    "grade": "8급"
+  },
+  {
+    "char": "北",
+    "meaning": "북녘",
+    "reading": "북",
+    "grade": "8급"
+  },
+  {
+    "char": "中",
+    "meaning": "가운데",
+    "reading": "중",
+    "grade": "8급"
+  },
+  {
+    "char": "白",
+    "meaning": "흰",
+    "reading": "백",
+    "grade": "8급"
+  },
+  {
+    "char": "靑",
+    "meaning": "푸를",
+    "reading": "청",
+    "grade": "8급"
+  },
+  {
+    "char": "人",
+    "meaning": "사람",
+    "reading": "인",
+    "grade": "8급"
+  },
+  {
+    "char": "大",
+    "meaning": "큰",
+    "reading": "대",
+    "grade": "8급"
+  },
+  {
+    "char": "小",
+    "meaning": "작을",
+    "reading": "소",
+    "grade": "8급"
+  },
+  {
+    "char": "女",
+    "meaning": "계집",
+    "reading": "녀",
+    "grade": "8급"
+  },
+  {
+    "char": "父",
+    "meaning": "아비",
+    "reading": "부",
+    "grade": "8급"
+  },
+  {
+    "char": "母",
+    "meaning": "어미",
+    "reading": "모",
+    "grade": "8급"
+  },
+  {
+    "char": "兄",
+    "meaning": "형",
+    "reading": "형",
+    "grade": "8급"
+  },
+  {
+    "char": "弟",
+    "meaning": "아우",
+    "reading": "제",
+    "grade": "8급"
+  },
+  {
+    "char": "生",
+    "meaning": "날",
+    "reading": "생",
+    "grade": "8급"
+  },
+  {
+    "char": "敎",
+    "meaning": "가르칠",
+    "reading": "교",
+    "grade": "8급"
+  },
+  {
+    "char": "校",
+    "meaning": "학교",
+    "reading": "교",
+    "grade": "8급"
+  },
+  {
+    "char": "先",
+    "meaning": "먼저",
+    "reading": "선",
+    "grade": "8급"
+  },
+  {
+    "char": "學",
+    "meaning": "배울",
+    "reading": "학",
+    "grade": "8급"
+  },
+  {
+    "char": "國",
+    "meaning": "나라",
+    "reading": "국",
+    "grade": "8급"
+  },
+  {
+    "char": "軍",
+    "meaning": "군사",
+    "reading": "군",
+    "grade": "8급"
+  },
+  {
+    "char": "民",
+    "meaning": "백성",
+    "reading": "민",
+    "grade": "8급"
+  },
+  {
+    "char": "韓",
+    "meaning": "한국",
+    "reading": "한",
+    "grade": "8급"
+  },
+  {
+    "char": "門",
+    "meaning": "문",
+    "reading": "문",
+    "grade": "8급"
+  },
+  {
+    "char": "室",
+    "meaning": "집",
+    "reading": "실",
+    "grade": "8급"
+  },
+  {
+    "char": "王",
+    "meaning": "임금",
+    "reading": "왕",
+    "grade": "8급"
+  },
+  {
+    "char": "外",
+    "meaning": "바깥",
+    "reading": "외",
+    "grade": "8급"
+  },
+  {
+    "char": "長",
+    "meaning": "긴",
+    "reading": "장",
+    "grade": "8급"
+  },
+  {
+    "char": "寸",
+    "meaning": "마디",
+    "reading": "촌",
+    "grade": "8급"
+  },
+  {
+    "char": "萬",
+    "meaning": "일만",
+    "reading": "만",
+    "grade": "8급"
+  },
+  {
+    "char": "家",
+    "meaning": "집",
+    "reading": "가",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "間",
+    "meaning": "사이",
+    "reading": "간",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "江",
+    "meaning": "강",
+    "reading": "강",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "車",
+    "meaning": "수레",
+    "reading": "거",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "工",
+    "meaning": "장인",
+    "reading": "공",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "空",
+    "meaning": "빌",
+    "reading": "공",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "氣",
+    "meaning": "기운",
+    "reading": "기",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "記",
+    "meaning": "기록할",
+    "reading": "기",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "男",
+    "meaning": "사내",
+    "reading": "남",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "內",
+    "meaning": "안",
+    "reading": "내",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "農",
+    "meaning": "농사",
+    "reading": "농",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "答",
+    "meaning": "대답",
+    "reading": "답",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "道",
+    "meaning": "길",
+    "reading": "도",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "動",
+    "meaning": "움직일",
+    "reading": "동",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "力",
+    "meaning": "힘",
+    "reading": "력",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "立",
+    "meaning": "설",
+    "reading": "립",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "每",
+    "meaning": "매양",
+    "reading": "매",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "名",
+    "meaning": "이름",
+    "reading": "명",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "物",
+    "meaning": "물건",
+    "reading": "물",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "方",
+    "meaning": "모",
+    "reading": "방",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "不",
+    "meaning": "아닐",
+    "reading": "불",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "事",
+    "meaning": "일",
+    "reading": "사",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "上",
+    "meaning": "윗",
+    "reading": "상",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "姓",
+    "meaning": "성",
+    "reading": "성",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "世",
+    "meaning": "인간",
+    "reading": "세",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "手",
+    "meaning": "손",
+    "reading": "수",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "時",
+    "meaning": "때",
+    "reading": "시",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "市",
+    "meaning": "저자",
+    "reading": "시",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "食",
+    "meaning": "밥",
+    "reading": "식",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "安",
+    "meaning": "편안",
+    "reading": "안",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "午",
+    "meaning": "낮",
+    "reading": "오",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "右",
+    "meaning": "오른",
+    "reading": "우",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "子",
+    "meaning": "아들",
+    "reading": "자",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "自",
+    "meaning": "스스로",
+    "reading": "자",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "場",
+    "meaning": "마당",
+    "reading": "장",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "電",
+    "meaning": "번개",
+    "reading": "전",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "前",
+    "meaning": "앞",
+    "reading": "전",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "全",
+    "meaning": "온전",
+    "reading": "전",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "正",
+    "meaning": "바를",
+    "reading": "정",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "足",
+    "meaning": "발",
+    "reading": "족",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "左",
+    "meaning": "왼",
+    "reading": "좌",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "直",
+    "meaning": "곧을",
+    "reading": "직",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "平",
+    "meaning": "평평할",
+    "reading": "평",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "下",
+    "meaning": "아래",
+    "reading": "하",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "漢",
+    "meaning": "한나라",
+    "reading": "한",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "海",
+    "meaning": "바다",
+    "reading": "해",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "話",
+    "meaning": "말씀",
+    "reading": "화",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "活",
+    "meaning": "살",
+    "reading": "활",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "孝",
+    "meaning": "효도",
+    "reading": "효",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "後",
+    "meaning": "뒤",
+    "reading": "후",
+    "grade": "7급Ⅱ"
+  },
+  {
+    "char": "歌",
+    "meaning": "노래",
+    "reading": "가",
+    "grade": "7급"
+  },
+  {
+    "char": "口",
+    "meaning": "입",
+    "reading": "구",
+    "grade": "7급"
+  },
+  {
+    "char": "旗",
+    "meaning": "기",
+    "reading": "기",
+    "grade": "7급"
+  },
+  {
+    "char": "同",
+    "meaning": "한가지",
+    "reading": "동",
+    "grade": "7급"
+  },
+  {
+    "char": "洞",
+    "meaning": "골",
+    "reading": "동",
+    "grade": "7급"
+  },
+  {
+    "char": "冬",
+    "meaning": "겨울",
+    "reading": "동",
+    "grade": "7급"
+  },
+  {
+    "char": "登",
+    "meaning": "오를",
+    "reading": "등",
+    "grade": "7급"
+  },
+  {
+    "char": "來",
+    "meaning": "올",
+    "reading": "래",
+    "grade": "7급"
+  },
+  {
+    "char": "老",
+    "meaning": "늙을",
+    "reading": "로",
+    "grade": "7급"
+  },
+  {
+    "char": "里",
+    "meaning": "마을",
+    "reading": "리",
+    "grade": "7급"
+  },
+  {
+    "char": "林",
+    "meaning": "수풀",
+    "reading": "림",
+    "grade": "7급"
+  },
+  {
+    "char": "面",
+    "meaning": "낯",
+    "reading": "면",
+    "grade": "7급"
+  },
+  {
+    "char": "命",
+    "meaning": "목숨",
+    "reading": "명",
+    "grade": "7급"
+  },
+  {
+    "char": "文",
+    "meaning": "글월",
+    "reading": "문",
+    "grade": "7급"
+  },
+  {
+    "char": "問",
+    "meaning": "물을",
+    "reading": "문",
+    "grade": "7급"
+  },
+  {
+    "char": "百",
+    "meaning": "일백",
+    "reading": "백",
+    "grade": "7급"
+  },
+  {
+    "char": "夫",
+    "meaning": "지아비",
+    "reading": "부",
+    "grade": "7급"
+  },
+  {
+    "char": "算",
+    "meaning": "셈",
+    "reading": "산",
+    "grade": "7급"
+  },
+  {
+    "char": "色",
+    "meaning": "빛",
+    "reading": "색",
+    "grade": "7급"
+  },
+  {
+    "char": "夕",
+    "meaning": "저녁",
+    "reading": "석",
+    "grade": "7급"
+  },
+  {
+    "char": "少",
+    "meaning": "적을",
+    "reading": "소",
+    "grade": "7급"
+  },
+  {
+    "char": "所",
+    "meaning": "바",
+    "reading": "소",
+    "grade": "7급"
+  },
+  {
+    "char": "數",
+    "meaning": "셈",
+    "reading": "수",
+    "grade": "7급"
+  },
+  {
+    "char": "植",
+    "meaning": "심을",
+    "reading": "식",
+    "grade": "7급"
+  },
+  {
+    "char": "心",
+    "meaning": "마음",
+    "reading": "심",
+    "grade": "7급"
+  },
+  {
+    "char": "語",
+    "meaning": "말씀",
+    "reading": "어",
+    "grade": "7급"
+  },
+  {
+    "char": "然",
+    "meaning": "그럴",
+    "reading": "연",
+    "grade": "7급"
+  },
+  {
+    "char": "有",
+    "meaning": "있을",
+    "reading": "유",
+    "grade": "7급"
+  },
+  {
+    "char": "育",
+    "meaning": "기를",
+    "reading": "육",
+    "grade": "7급"
+  },
+  {
+    "char": "邑",
+    "meaning": "고을",
+    "reading": "읍",
+    "grade": "7급"
+  },
+  {
+    "char": "入",
+    "meaning": "들",
+    "reading": "입",
+    "grade": "7급"
+  },
+  {
+    "char": "字",
+    "meaning": "글자",
+    "reading": "자",
+    "grade": "7급"
+  },
+  {
+    "char": "祖",
+    "meaning": "할아비",
+    "reading": "조",
+    "grade": "7급"
+  },
+  {
+    "char": "住",
+    "meaning": "살",
+    "reading": "주",
+    "grade": "7급"
+  },
+  {
+    "char": "主",
+    "meaning": "주인",
+    "reading": "주",
+    "grade": "7급"
+  },
+  {
+    "char": "重",
+    "meaning": "무거울",
+    "reading": "중",
+    "grade": "7급"
+  },
+  {
+    "char": "紙",
+    "meaning": "종이",
+    "reading": "지",
+    "grade": "7급"
+  },
+  {
+    "char": "地",
+    "meaning": "땅",
+    "reading": "지",
+    "grade": "7급"
+  },
+  {
+    "char": "千",
+    "meaning": "일천",
+    "reading": "천",
+    "grade": "7급"
+  },
+  {
+    "char": "天",
+    "meaning": "하늘",
+    "reading": "천",
+    "grade": "7급"
+  },
+  {
+    "char": "川",
+    "meaning": "내",
+    "reading": "천",
+    "grade": "7급"
+  },
+  {
+    "char": "草",
+    "meaning": "풀",
+    "reading": "초",
+    "grade": "7급"
+  },
+  {
+    "char": "村",
+    "meaning": "마을",
+    "reading": "촌",
+    "grade": "7급"
+  },
+  {
+    "char": "秋",
+    "meaning": "가을",
+    "reading": "추",
+    "grade": "7급"
+  },
+  {
+    "char": "春",
+    "meaning": "봄",
+    "reading": "춘",
+    "grade": "7급"
+  },
+  {
+    "char": "出",
+    "meaning": "날",
+    "reading": "출",
+    "grade": "7급"
+  },
+  {
+    "char": "便",
+    "meaning": "편할",
+    "reading": "편",
+    "grade": "7급"
+  },
+  {
+    "char": "夏",
+    "meaning": "여름",
+    "reading": "하",
+    "grade": "7급"
+  },
+  {
+    "char": "花",
+    "meaning": "꽃",
+    "reading": "화",
+    "grade": "7급"
+  },
+  {
+    "char": "休",
+    "meaning": "쉴",
+    "reading": "휴",
+    "grade": "7급"
+  }
+]
