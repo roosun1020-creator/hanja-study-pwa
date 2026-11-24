@@ -4,43 +4,40 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#7856bc">
-  <meta name="description" content="한자 탐험대 PWA: 150자 카드 학습, 자동 저장, 오프라인 사용">
+  <meta name="description" content="한자 탐험대 · 150자 한자 배우기, 퀴즈, 복습, 카드 맞추기. 오프라인 자동 저장 PWA">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="한자 탐험대">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/icon-192.png">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
   <link rel="stylesheet" href="./style.css">
-  <title>한자 탐험대 · PWA 시작</title>
+  <title>한자 탐험대 · PWA v2.0.1</title>
   <script defer src="./app.js"></script>
 </head>
 <body>
   <main class="shell">
     <header class="hero">
-      <div class="hero-title"><span class="eyebrow">PWA 시험판 · v2.0.0</span><h1>한자 탐험대</h1><p>드래곤과 떠나는 한자 카드 모험!</p></div>
-      <img src="./assets/forest.webp" alt="새싹 드래곤 그루" width="132" height="132">
+      <div class="hero-title"><span class="eyebrow">드래곤 가디언즈 · PWA v2.0.1</span><h1>한자 탐험대</h1><p>배우고, 맞히고, 기억하는 한자 모험!</p></div>
+      <img src="./assets/forest.webp" alt="숲의 아기 드래곤 그루" width="140" height="140">
     </header>
-    <section class="stats" aria-label="학습 현황"><span id="save-status" role="status">기록 확인 중…</span><span id="seen-count">확인한 한자 0/150</span></section>
-    <section class="panel" aria-labelledby="scope-title">
-      <h2 id="scope-title">어떤 한자를 만나 볼까요?</h2>
-      <div class="scopes" id="scope-list"></div>
-    </section>
-    <section class="panel lesson" aria-labelledby="card-heading">
-      <div class="card-header"><h2 id="card-heading">오늘의 한자 카드</h2><strong id="card-counter">1 / 50</strong></div>
-      <div class="meter"><span id="meter-fill"></span></div>
-      <p class="instruction" id="card-instruction">카드를 눌러 뜻과 음을 확인하세요.</p>
-      <button class="flashcard" id="flashcard" type="button" aria-label="한자 카드 뒤집기" disabled><span class="char" id="card-hanja">漢</span><span class="answer" id="card-answer" hidden></span><span class="tap-hint" id="tap-hint">터치해서 정답 보기</span></button>
-      <div class="actions"><button class="secondary" id="reshuffle" type="button">다시 섞기</button><button class="primary" id="next-card" type="button" disabled>다음 한자 →</button></div>
-      <p class="note">한 번 섞은 카드는 중복 없이 등장합니다. 진행 상황은 이 기기에 자동 저장됩니다.</p>
-    </section>
-    <section class="panel tools" aria-labelledby="tools-title">
-      <h2 id="tools-title">학부모용 기록 보관</h2>
-      <p>휴대전화 분실·기기 변경에 대비해 백업 파일을 따로 저장해 두세요.</p>
-      <div class="actions"><button id="export-json" class="secondary" type="button">JSON 백업 저장</button><button id="import-json" class="secondary" type="button">PWA 백업 복원</button></div>
+    <div class="status-strip" aria-live="polite"><span id="save-status" role="status">기록 확인 중…</span><span id="offline-status">기록은 휴대전화에 자동 저장돼요</span></div>
+    <nav class="menu" aria-label="학습 메뉴" id="main-nav">
+      <button data-page="home" type="button">🏠<span>홈</span></button>
+      <button data-page="learn" type="button">📖<span>배우기</span></button>
+      <button data-page="quiz" type="button">🎯<span>퀴즈</span></button>
+      <button data-page="review" type="button">🧠<span>복습</span></button>
+      <button data-page="cards" type="button">🧩<span>한자 카드</span></button>
+      <button data-page="records" type="button">🏆<span>기록</span></button>
+    </nav>
+    <div class="page-content" id="page-content" aria-live="polite"><section class="panel"><p>한자 모험을 준비하는 중이에요…</p></section></div>
+    <section class="panel parent-tools" id="parent-tools" hidden>
+      <h2>👨‍👩‍👧 학부모용 기록 보관</h2>
+      <p>기기 교체나 앱 데이터 삭제에 대비해 JSON 파일을 보관하세요. 백업에 학습 진도와 문제 풀이 기록도 포함됩니다.</p>
+      <div class="actions"><button id="export-json" class="secondary" type="button">💾 JSON 백업 저장</button><button id="import-json" class="secondary" type="button">📂 백업 복원</button></div>
       <input id="import-file" type="file" accept="application/json,.json" hidden>
-      <p class="note">기존 Streamlit v1.2.3.8의 JSON 기록은 아직 직접 불러오지 않습니다. 다음 단계에서 이관 기능을 추가합니다.</p>
+      <p class="note">v2.0.0 PWA 백업과 기존 Streamlit JSON 기록 가져오기를 지원합니다. 복원 전에 현재 기록을 백업해 두세요.</p>
     </section>
-    <footer>v2.0.0 · PWA 기반 동작 시험판<br>기존 Streamlit의 퀴즈·복습·쓰기·드래곤 배틀은 다음 단계에서 이식합니다.</footer>
+    <footer>한자 탐험대 v2.0.1 · 개인 학습용<br>현재 PWA: 홈·배우기·퀴즈·복습·카드·기록 · 쓰기와 드래곤 배틀은 후속 버전에서 추가</footer>
   </main>
 </body>
 </html>
