@@ -1,5 +1,5 @@
 /* 한자 탐험대 PWA v2.1.3 — 실제 추가 이미지 프레임 재생기
- * 아기 드래곤 3종 × (대기 8 / 공격 12 / 승리 8) 프레임.
+ * 아기 드래곤 3종 × (대기 8 / 공격 8 / 승리 8) 프레임.
  * 기존 학습·전투 판정·저장 로직을 수정하지 않습니다.
  */
 (() => {
@@ -8,7 +8,7 @@
   const SIZE = 256;
   const MODES = Object.freeze({
     idle:    { frames: 8,  fps: 5.0, loop: true,  linger: 0 },
-    attack:  { frames: 12, fps: 5.5, loop: false, linger: 720 },
+    attack:  { frames: 8, fps: 4.25, loop: false, linger: 720 },
     victory: { frames: 8,  fps: 5.2, loop: false, linger: 680 }
   });
   const imagePromises = new Map();
@@ -164,7 +164,7 @@
       if (!document.hidden) schedule();
     });
   }
-  window.HanjaSprites = { mount, play, version: '2.1.3', modes: MODES };
+  window.HanjaSprites = { mount, play, version: '2.1.3.3', modes: MODES };
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', setup, { once: true });
   } else setup();
