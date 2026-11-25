@@ -1,5 +1,5 @@
-/* 한자 탐험대 PWA v2.1.3 — 실제 추가 이미지 프레임 재생기
- * 아기 드래곤 3종 × (대기 8 / 공격 8 / 승리 8) 프레임.
+/* 한자 탐험대 PWA v2.1.4 — 3단계 드래곤 애니메이션 재생기
+ * 드래곤 3종 × 진화 3단계 × (대기 8 / 공격 8 / 승리 8) 프레임.
  * 기존 학습·전투 판정·저장 로직을 수정하지 않습니다.
  */
 (() => {
@@ -16,8 +16,8 @@
   const byHolder = new WeakMap();
   let animationId = 0;
 
-  function loadImage(key, mode) {
-    const url = `./assets/animations/dragons/${key}_1_${mode}.webp`;
+  function loadImage(key, stage, mode) {
+    const url = `./assets/animations/dragons/${key}_${stage}_${mode}.webp`;
     if (!imagePromises.has(url)) {
       imagePromises.set(url, new Promise((resolve, reject) => {
         const img = new Image();
@@ -73,7 +73,7 @@
     actor.fade = null;
     actor.loading = true; // Hold the last visible frame while the next sheet is loading.
     const token = ++actor.token;
-    loadImage(actor.key, mode).then(sheet => {
+    loadImage(actor.key, actor.stage, mode).then(sheet => {
       if (actor.token !== token || !actor.holder.isConnected) return;
       actor.sheet = sheet;
       actor.loading = false;
@@ -122,11 +122,12 @@
       img.dataset.spriteMounted = '1';
       const key = img.dataset.spriteDragon;
       const stage = Number(img.dataset.spriteStage);
-      // Growth stages still use their original, stable portraits.
-      if (!ELEMENTS.has(key) || stage !== 1 || !img.parentNode) continue;
+      // Evolution stages 2 and 3 have dedicated 8-frame sprites; fallback keeps original portrait.
+      if (!ELEMENTS.has(key) || !Number.isInteger(stage) || stage < 1 || stage > 3 || !img.parentNode) continue;
       const holder = document.createElement('span');
       holder.className = 'sprite-holder';
       holder.dataset.spriteType = key;
+      holder.dataset.spriteStage = String(stage);
       img.parentNode.insertBefore(holder, img);
       holder.appendChild(img);
       const canvas = document.createElement('canvas');
@@ -138,7 +139,7 @@
       holder.appendChild(canvas);
       const ctx = canvas.getContext('2d', { alpha: true });
       if (!ctx) continue;
-      const actor = { key, holder, canvas, ctx, fallback: img, token: 0,
+      const actor = { key, stage, holder, canvas, ctx, fallback: img, token: 0,
         sheet: null, lastFrame: -1, startAt: 0, mode: 'idle',
         ended: false, endAt: 0, fade: null, loading: false };
       actors.add(actor);
@@ -164,7 +165,7 @@
       if (!document.hidden) schedule();
     });
   }
-  window.HanjaSprites = { mount, play, version: '2.1.3.3', modes: MODES };
+  window.HanjaSprites = { mount, play, version: '2.1.4', modes: MODES };
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', setup, { once: true });
   } else setup();
