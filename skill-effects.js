@@ -89,7 +89,7 @@ function draw(ctx,meta,kind,idx,t,seconds){
  ctx.restore();
 }
 function attach(stage,dialog){
- if(stage.dataset.hanjaSkillFx==='1')return;
+ if(stage.dataset.hanjaSkillFx==='1'||!stage.querySelector('.projectile'))return;
  const kind=stage.dataset.element,idx=Number(stage.dataset.tier);
  if(!KINDS[kind]||!Number.isInteger(idx)||idx<0||idx>4)return;
  stage.dataset.hanjaSkillFx='1';
@@ -101,13 +101,13 @@ function attach(stage,dialog){
  function frame(now){
    if(!dialog.open||!stage.isConnected)return;
    if(!begin)begin=now;
-   const elapsed=now-begin;const t=elapsed/2800;
+   const elapsed=now-begin;const t=elapsed/1600;
    const dpr=Math.min(2,window.devicePixelRatio||1);
    const w=Math.max(1,Math.round(stage.clientWidth*dpr)),h=Math.max(1,Math.round(stage.clientHeight*dpr));
    if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;}
    ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w/dpr,h/dpr);
    if(t<=1)draw(ctx,locate(stage),kind,idx,t,elapsed/1000);
-   if(elapsed<2900)requestAnimationFrame(frame);else canvas.remove();
+   if(elapsed<1800)requestAnimationFrame(frame);else canvas.remove();
  }
  requestAnimationFrame(frame);
 }
@@ -118,5 +118,5 @@ function setup(){
  check();
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup,{once:true});else setup();
-window.HanjaSkillFX={version:'2.1.4',names:KINDS};
+window.HanjaSkillFX={version:'2.1.9',names:KINDS};
 })();

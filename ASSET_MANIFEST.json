@@ -1,0 +1,113 @@
+{
+  "version": "2.1.9",
+  "assets": {
+    "assets/animations/dragons/fire_1_attack.webp": {
+      "sha256": "31bb94089faeb4a36ae0979fac4648db43052acc3966acf08daac8462bd3a490",
+      "size": 256282
+    },
+    "assets/animations/dragons/fire_1_idle.webp": {
+      "sha256": "b934606703721a010cdd26842de0877b28afdd81dcb91b6ba7425af10e6945dd",
+      "size": 189042
+    },
+    "assets/animations/dragons/fire_1_victory.webp": {
+      "sha256": "359b8725cb35c10ce66a6a4013e462acc287b90d1214b824156e212f5a7ce357",
+      "size": 220450
+    },
+    "assets/animations/dragons/fire_2_attack.webp": {
+      "sha256": "6903b46f591a6f0a16fe0a336537da7a7d7d548f7a8443c894d4ba9d067fa344",
+      "size": 292940
+    },
+    "assets/animations/dragons/fire_2_idle.webp": {
+      "sha256": "0a8ae9ab1fca8e8f2d7134dab84f454044b80acc0ccbab7e35526bbcfa498f08",
+      "size": 217582
+    },
+    "assets/animations/dragons/fire_2_victory.webp": {
+      "sha256": "123cc399450a1d6483077296ab4ee3d020daa50591bc9a5f8467f450b58bc9ff",
+      "size": 256300
+    },
+    "assets/animations/dragons/fire_3_attack.webp": {
+      "sha256": "9e218202efcf7c05e03acfeb9b0e9863f1c1e3df106c801c656f122f93f867ef",
+      "size": 417884
+    },
+    "assets/animations/dragons/fire_3_idle.webp": {
+      "sha256": "92c16875467fcab883ee805ef815a3c19719c0654188c88d9565e0bfef28e841",
+      "size": 329458
+    },
+    "assets/animations/dragons/fire_3_victory.webp": {
+      "sha256": "7d0274fe719f5f1f7de0ef546a3a807dd4c6ff7df3ceb35404de344aa0b1066f",
+      "size": 500574
+    },
+    "assets/animations/dragons/forest_1_attack.webp": {
+      "sha256": "6e2bf6e25f4c80b119db5510fb537b2cb24995876b06a44b86ea6cae76f8f8ba",
+      "size": 294056
+    },
+    "assets/animations/dragons/forest_1_idle.webp": {
+      "sha256": "bec940664731afac16ac064e73b768b33d1b7ce1de9f41d2cee99d393ed699ea",
+      "size": 233790
+    },
+    "assets/animations/dragons/forest_1_victory.webp": {
+      "sha256": "87ff9a665aa598e297b017efaf03bef0ced85003c81cdd9f7155148a5757e51b",
+      "size": 274478
+    },
+    "assets/animations/dragons/forest_2_attack.webp": {
+      "sha256": "edea16547b2bf095071cfd1f9dc48e446f7ac2ea883ae3923b2903251dc18145",
+      "size": 341392
+    },
+    "assets/animations/dragons/forest_2_idle.webp": {
+      "sha256": "c1ed45222c9638779bbfc313db03eb3aa21d10a6b13a6368790ab575efa3662f",
+      "size": 286844
+    },
+    "assets/animations/dragons/forest_2_victory.webp": {
+      "sha256": "a8e99986bda8aefdf2225c1ac7ab2aac6350efc464cf9562a4e272f7026badf6",
+      "size": 309650
+    },
+    "assets/animations/dragons/forest_3_attack.webp": {
+      "sha256": "13a93a356b21cc05398c35f1c9800546ae21b39237ef3731011d0e1919d54062",
+      "size": 394084
+    },
+    "assets/animations/dragons/forest_3_idle.webp": {
+      "sha256": "2ec34ab897e38b24f9104b4d28bc6420adac5425d7f931129fd3dcedef3f7996",
+      "size": 334580
+    },
+    "assets/animations/dragons/forest_3_victory.webp": {
+      "sha256": "775f260bd15bac5d207911c481abeb9523eabc9b2f00fbea0a6ea5c6f99c65a3",
+      "size": 494028
+    },
+    "assets/animations/dragons/water_1_attack.webp": {
+      "sha256": "f091715a0a16b31b2aaa69165762023df2e4a324ded1a4249f313b9d9f26bcaf",
+      "size": 267966
+    },
+    "assets/animations/dragons/water_1_idle.webp": {
+      "sha256": "357f10682d6a1267d2de44a069ce3383ae0380948cd134ea7499ef3c7eb12989",
+      "size": 206414
+    },
+    "assets/animations/dragons/water_1_victory.webp": {
+      "sha256": "e84a71db66e8b4b0c3a99ec942a05fd26022d38b0815763b916e9328737b60a9",
+      "size": 242488
+    },
+    "assets/animations/dragons/water_2_attack.webp": {
+      "sha256": "fd159b5d03083c03c390efcb430c1f3b30b3ab6ef1006572d267e03bcdcfaf55",
+      "size": 315310
+    },
+    "assets/animations/dragons/water_2_idle.webp": {
+      "sha256": "38de39e6d48f82b6a9bc794fa3255a724b8864831150a2fd50e7b4fb4c9e561e",
+      "size": 243232
+    },
+    "assets/animations/dragons/water_2_victory.webp": {
+      "sha256": "80b7351848cdea1ff493d1c811fd16a3f1560c2ef5f2c46956752296d27a4953",
+      "size": 272934
+    },
+    "assets/animations/dragons/water_3_attack.webp": {
+      "sha256": "17c29c2fad3de102a5cd26782b325f96e8370352f404d4d9a5c5959f3915ac85",
+      "size": 439324
+    },
+    "assets/animations/dragons/water_3_idle.webp": {
+      "sha256": "617aa697392c6186a37ae57c47347e5727aba1c93f1c73bb6ebdbf598e7731a4",
+      "size": 389390
+    },
+    "assets/animations/dragons/water_3_victory.webp": {
+      "sha256": "5f524e8f2129a2d1d01d22fa1011d3bd95c55ab93587adfa9a7b8cc764e6e882",
+      "size": 549772
+    }
+  }
+}

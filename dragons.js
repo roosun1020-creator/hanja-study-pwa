@@ -186,6 +186,34 @@ function stopAttackMotion(){
   if(attackTimer){clearTimeout(attackTimer);attackTimer=null;}
   if(attackMotion){try{attackMotion.cancel();}catch{}attackMotion=null;}
 }
+
+function skillMotionProfile(element,tier){
+  const T=Math.max(0,Math.min(4,tier));
+  const profiles={
+    fire:[
+      {delay:430,duration:1180,arc:-8,maxScale:.90,rotate:0, dragon:[{transform:'translateX(0) translateY(0) scale(1)',offset:0},{transform:'translateX(6px) translateY(-2px) scale(1.03)',offset:.35},{transform:'translateX(0) translateY(0) scale(1)',offset:1}]},
+      {delay:420,duration:1050,arc:-2,maxScale:1.02,rotate:-18,dragon:[{transform:'translateX(0) rotate(0deg) scale(1)',offset:0},{transform:'translateX(-6px) rotate(-7deg) scale(1.02)',offset:.28},{transform:'translateX(10px) rotate(11deg) scale(1.06)',offset:.63},{transform:'translateX(0) rotate(0deg) scale(1)',offset:1}]},
+      {delay:470,duration:1320,arc:-20,maxScale:1.05,rotate:-22,dragon:[{transform:'translateX(0) rotate(0deg) scale(1)',offset:0},{transform:'translateX(-8px) translateY(-2px) rotate(-10deg) scale(1.04)',offset:.25},{transform:'translateX(6px) translateY(-7px) rotate(14deg) scale(1.08)',offset:.58},{transform:'translateX(0) rotate(0deg) scale(1)',offset:1}]},
+      {delay:500,duration:1500,arc:-15,maxScale:1.18,rotate:0,dragon:[{transform:'translateX(0) scale(1)',offset:0},{transform:'translateX(4px) translateY(-5px) scale(1.05)',offset:.22},{transform:'translateX(14px) translateY(-3px) scale(1.09)',offset:.50},{transform:'translateX(9px) scale(1.05)',offset:.82},{transform:'translateX(0) scale(1)',offset:1}]},
+      {delay:560,duration:1650,arc:-28,maxScale:1.26,rotate:-6,dragon:[{transform:'translateX(0) translateY(0) scale(1)',offset:0},{transform:'translateX(-10px) translateY(8px) scale(.96)',offset:.18},{transform:'translateX(18px) translateY(-10px) scale(1.13)',offset:.52},{transform:'translateX(8px) translateY(-5px) scale(1.08)',offset:.78},{transform:'translateX(0) translateY(0) scale(1)',offset:1}]}
+    ],
+    water:[
+      {delay:430,duration:1180,arc:-16,maxScale:.92,rotate:8,dragon:[{transform:'translateX(0) scale(1)',offset:0},{transform:'translateX(5px) translateY(-2px) scale(1.02)',offset:.3},{transform:'translateX(0) scale(1)',offset:1}]},
+      {delay:490,duration:1480,arc:-12,maxScale:1.14,rotate:10,dragon:[{transform:'translateX(0) scale(1)',offset:0},{transform:'translateX(3px) translateY(-8px) scale(1.04)',offset:.25},{transform:'translateX(13px) translateY(-5px) scale(1.08)',offset:.58},{transform:'translateX(0) scale(1)',offset:1}]},
+      {delay:470,duration:1350,arc:-28,maxScale:1.02,rotate:14,dragon:[{transform:'translateX(0) rotate(0deg) scale(1)',offset:0},{transform:'translateX(-6px) rotate(-5deg) scale(1.03)',offset:.25},{transform:'translateX(7px) rotate(8deg) scale(1.06)',offset:.55},{transform:'translateX(0) rotate(0deg) scale(1)',offset:1}]},
+      {delay:430,duration:1120,arc:-5,maxScale:1.00,rotate:28,dragon:[{transform:'translateX(0) rotate(0deg) scale(1)',offset:0},{transform:'translateX(-4px) rotate(-14deg) scale(1.02)',offset:.22},{transform:'translateX(10px) rotate(10deg) scale(1.05)',offset:.58},{transform:'translateX(0) rotate(0deg) scale(1)',offset:1}]},
+      {delay:570,duration:1650,arc:-35,maxScale:1.24,rotate:4,dragon:[{transform:'translateX(0) translateY(0) scale(1)',offset:0},{transform:'translateX(-8px) translateY(8px) scale(.97)',offset:.16},{transform:'translateX(16px) translateY(-10px) scale(1.12)',offset:.50},{transform:'translateX(10px) translateY(-6px) scale(1.09)',offset:.77},{transform:'translateX(0) translateY(0) scale(1)',offset:1}]}
+    ],
+    forest:[
+      {delay:440,duration:1180,arc:12,maxScale:.91,rotate:-10,dragon:[{transform:'translateX(0) scale(1)',offset:0},{transform:'translateX(5px) translateY(-2px) scale(1.02)',offset:.35},{transform:'translateX(0) scale(1)',offset:1}]},
+      {delay:460,duration:1220,arc:8,maxScale:1.00,rotate:-22,dragon:[{transform:'translateX(0) rotate(0deg) scale(1)',offset:0},{transform:'translateX(-4px) rotate(-10deg) scale(1.02)',offset:.24},{transform:'translateX(11px) rotate(8deg) scale(1.06)',offset:.58},{transform:'translateX(0) rotate(0deg) scale(1)',offset:1}]},
+      {delay:450,duration:1120,arc:2,maxScale:.97,rotate:-28,dragon:[{transform:'translateX(0) translateY(0) scale(1)',offset:0},{transform:'translateX(-5px) translateY(-4px) rotate(-6deg) scale(1.03)',offset:.25},{transform:'translateX(8px) translateY(2px) rotate(9deg) scale(1.05)',offset:.55},{transform:'translateX(0) translateY(0) scale(1)',offset:1}]},
+      {delay:500,duration:1450,arc:18,maxScale:1.10,rotate:-5,dragon:[{transform:'translateX(0) translateY(0) scale(1)',offset:0},{transform:'translateX(-6px) translateY(6px) scale(.98)',offset:.2},{transform:'translateX(12px) translateY(-5px) scale(1.08)',offset:.56},{transform:'translateX(0) translateY(0) scale(1)',offset:1}]},
+      {delay:580,duration:1680,arc:26,maxScale:1.22,rotate:0,dragon:[{transform:'translateX(0) translateY(0) scale(1)',offset:0},{transform:'translateX(-9px) translateY(8px) scale(.97)',offset:.16},{transform:'translateX(15px) translateY(-11px) scale(1.12)',offset:.52},{transform:'translateX(9px) translateY(-6px) scale(1.08)',offset:.79},{transform:'translateX(0) translateY(0) scale(1)',offset:1}]}
+    ]
+  };
+  return (profiles[element]||profiles.fire)[T];
+}
 function playAttackMotion(dialog,correct,element,tier){
   const serial=attackSerial;
   const projectile=dialog.querySelector('.projectile');
@@ -195,24 +223,14 @@ function playAttackMotion(dialog,correct,element,tier){
   const stage=dialog.querySelector('.attack-stage');
   const impact=dialog.querySelector('.attack-impact');
   const damage=dialog.querySelector('.attack-damage');
+  const profile=skillMotionProfile(element,tier);
   let impacted=false;
-  const finish=()=>{
-    if(serial!==attackSerial||!dialog.open)return;
-    result?.classList.add('visible');
-    dialog.querySelector('#attack-close')?.focus({preventScroll:true});
-  };
+  const finish=()=>{ if(serial!==attackSerial||!dialog.open)return; result?.classList.add('visible'); dialog.querySelector('#attack-close')?.focus({preventScroll:true}); };
   const hit=()=>{
     if(impacted||serial!==attackSerial||!dialog.open)return;
-    impacted=true;
-    impact?.classList.add('burst');
-    damage?.classList.add('visible');
-    if(enemy?.animate)enemy.animate([
-      {transform:'translateX(0) scale(1)',filter:'brightness(1)'},
-      {transform:'translateX(-9px) scale(.95)',filter:'brightness(1.8)'},
-      {transform:'translateX(7px) scale(1.04)',filter:'brightness(1.3)'},
-      {transform:'translateX(0) scale(1)',filter:'brightness(1)'}
-    ],{duration:430,easing:'ease-out'});
-    attackTimer=setTimeout(finish,650);
+    impacted=true; impact?.classList.add('burst'); damage?.classList.add('visible');
+    if(enemy?.animate)enemy.animate([{transform:'translateX(0) scale(1)',filter:'brightness(1)'},{transform:'translateX(-9px) scale(.95)',filter:'brightness(1.8)'},{transform:'translateX(7px) scale(1.04)',filter:'brightness(1.3)'},{transform:'translateX(0) scale(1)',filter:'brightness(1)'}],{duration:430,easing:'ease-out'});
+    attackTimer=setTimeout(finish,700);
   };
   if(!correct){attackTimer=setTimeout(finish,320);return;}
   const start=async()=>{
@@ -220,53 +238,32 @@ function playAttackMotion(dialog,correct,element,tier){
     if(serial!==attackSerial||!dialog.open||!projectile||!stage)return;
     await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
     if(serial!==attackSerial||!dialog.open)return;
-    // Compute the flight path from the actual dragon sprite to the actual opponent
-    // so the impact lands correctly on narrow Android screens and larger tablets.
     const stageRect=stage.getBoundingClientRect();
     const dragonImage=dragon?.querySelector('.sprite-holder')||dragon?.querySelector('img');
     const enemyImage=enemy?.querySelector('img');
-    const origin=dragonImage?.getBoundingClientRect();
-    const target=enemyImage?.getBoundingClientRect();
-    const spriteWidth=projectile.getBoundingClientRect().width||90;
-    const spriteHeight=projectile.getBoundingClientRect().height||80;
+    const origin=dragonImage?.getBoundingClientRect(); const target=enemyImage?.getBoundingClientRect();
+    const spriteWidth=projectile.getBoundingClientRect().width||90; const spriteHeight=projectile.getBoundingClientRect().height||80;
     let startX=origin?origin.right-origin.width*.30-stageRect.left-spriteWidth*.5:stageRect.width*.18;
     let startY=origin?origin.top+origin.height*.40-stageRect.top-spriteHeight*.5:stageRect.height*.37;
     let endX=target?target.left+target.width*.40-stageRect.left-spriteWidth*.5:stageRect.width*.74;
     let endY=target?target.top+target.height*.45-stageRect.top-spriteHeight*.5:stageRect.height*.43;
-    startX=Math.max(-15,Math.min(stageRect.width-spriteWidth,startX));
-    startY=Math.max(24,Math.min(stageRect.height-spriteHeight,startY));
-    projectile.style.left=startX+'px';projectile.style.top=startY+'px';
-    const dx=endX-startX,dy=endY-startY;
-    if(impact){impact.style.left=(endX+spriteWidth*.5)+'px';impact.style.top=(endY+spriteHeight*.5)+'px';}
-    if(damage){damage.style.left=(endX+spriteWidth*.5)+'px';damage.style.top=(endY+spriteHeight*.5-28)+'px';}
-    const arc=element==='water'?-22:element==='forest'?18:-(5+tier*3);
-    const maxScale=.85+tier*.12;
-    if(dragon?.animate)dragon.animate([
-      {transform:'translateX(0) scale(1)'},{transform:'translateX(9px) scale(1.05)'},{transform:'translateX(0) scale(1)'}
-    ],{duration:390,easing:'ease-out'});
+    startX=Math.max(-15,Math.min(stageRect.width-spriteWidth,startX)); startY=Math.max(24,Math.min(stageRect.height-spriteHeight,startY));
+    projectile.style.left=startX+'px'; projectile.style.top=startY+'px'; const dx=endX-startX,dy=endY-startY;
+    if(impact){impact.style.left=(endX+spriteWidth*.5)+'px'; impact.style.top=(endY+spriteHeight*.5)+'px';}
+    if(damage){damage.style.left=(endX+spriteWidth*.5)+'px'; damage.style.top=(endY+spriteHeight*.5-28)+'px';}
+    if(dragon?.animate)dragon.animate(profile.dragon,{duration:Math.max(390,profile.duration-180),easing:'ease-out'});
     if(typeof projectile.animate==='function'){
       try{
         projectile.style.opacity='1';
-        attackMotion=projectile.animate([
-          {transform:'translate3d(0,0,0) scale(.55)',opacity:0,offset:0},
-          {transform:`translate3d(${dx*.1}px,${arc*.6}px,0) scale(${maxScale*.85})`,opacity:1,offset:.12},
-          {transform:`translate3d(${dx*.55}px,${dy*.55+arc}px,0) rotate(${element==='forest'?-20:element==='water'?10:0}deg) scale(${maxScale})`,opacity:1,offset:.55},
-          {transform:`translate3d(${dx*.91}px,${dy*.91+arc*.15}px,0) scale(${maxScale*1.3})`,opacity:1,offset:.91},
-          {transform:`translate3d(${dx}px,${dy}px,0) scale(${maxScale*1.45})`,opacity:0,offset:1}
-        ],{duration:1500,easing:'ease-in-out',fill:'forwards'});
+        attackMotion=projectile.animate([{transform:'translate3d(0,0,0) scale(.55)',opacity:0,offset:0},{transform:`translate3d(${dx*.10}px,${profile.arc*.55}px,0) scale(${profile.maxScale*.82})`,opacity:1,offset:.12},{transform:`translate3d(${dx*.56}px,${dy*.56+profile.arc}px,0) rotate(${profile.rotate}deg) scale(${profile.maxScale})`,opacity:1,offset:.56},{transform:`translate3d(${dx*.92}px,${dy*.92+profile.arc*.14}px,0) rotate(${profile.rotate*.35}deg) scale(${profile.maxScale*1.24})`,opacity:1,offset:.92},{transform:`translate3d(${dx}px,${dy}px,0) scale(${profile.maxScale*1.38})`,opacity:0,offset:1}],{duration:profile.duration,easing:'ease-in-out',fill:'forwards'});
         attackMotion.onfinish=hit;
       }catch(error){console.warn('attack animation fallback',error);}
       if(attackMotion)return;
     }
-    // Fallback: CSS custom properties keep both the destination and duration accurate.
-    projectile.style.setProperty('--flight-x',dx+'px');
-    projectile.style.setProperty('--flight-y',dy+'px');
-    projectile.classList.add('css-flight');
-    attackTimer=setTimeout(hit,1500);
+    projectile.style.setProperty('--flight-x',dx+'px'); projectile.style.setProperty('--flight-y',dy+'px'); projectile.classList.add('css-flight'); attackTimer=setTimeout(hit,profile.duration);
   };
-  setTimeout(()=>{if(serial===attackSerial)start().catch(()=>{if(serial===attackSerial)hit();});},510);
-  // Android WebView may skip animation finish after an interruption.
-  setTimeout(()=>{if(serial===attackSerial&&dialog.open&&!impacted)hit();},3600);
+  setTimeout(()=>{if(serial===attackSerial)start().catch(()=>{if(serial===attackSerial)hit();});},profile.delay);
+  setTimeout(()=>{if(serial===attackSerial&&dialog.open&&!impacted)hit();},profile.delay+profile.duration+1800);
 }
 function openAttackDialog({correct,used,skill,enemy,remainingHP,answer,points=25,special='',combo=0}){
   stopAttackMotion();
@@ -281,7 +278,7 @@ function openAttackDialog({correct,used,skill,enemy,remainingHP,answer,points=25
       <div class="attack-title">${htmlEscape(d.name)} · ${htmlEscape(move)}!</div>
       <div class="figures"><div class="unit attack-dragon"><img src="${dragonArt(used,stage)}" ${spriteAttrs(used,stage,'attack')} alt="${d.name}"><span>${d.name}</span></div>
         <div class="unit enemy-hit"><img src="${monsterArt(enemy)}" alt="${m.name}"><span class="enemy-name">${htmlEscape(m.name)}</span><span class="enemy-hp">HP ${remainingHP}/100</span></div></div>
-      ${correct?`<img class="projectile" src="${used==='forest'?'./assets/animations/effects/forest_vortex.webp':effectArt(used,skill)}" alt="기술 ${htmlEscape(move)}가 몬스터에게 날아갑니다">
+      ${correct?`<img class="projectile" src="${effectArt(used,skill)}" alt="기술 ${htmlEscape(move)}가 몬스터에게 날아갑니다">
         <div class="attack-impact" aria-hidden="true"><div class="impact-ring"></div><div class="impact-ring second"></div>${particles}</div>
         <div class="attack-damage" aria-hidden="true">-25</div>`:''}
     </div>
