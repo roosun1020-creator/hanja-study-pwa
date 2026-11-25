@@ -281,7 +281,7 @@ function openAttackDialog({correct,used,skill,enemy,remainingHP,answer,points=25
       <div class="attack-title">${htmlEscape(d.name)} · ${htmlEscape(move)}!</div>
       <div class="figures"><div class="unit attack-dragon"><img src="${dragonArt(used,stage)}" ${spriteAttrs(used,stage,'attack')} alt="${d.name}"><span>${d.name}</span></div>
         <div class="unit enemy-hit"><img src="${monsterArt(enemy)}" alt="${m.name}"><span class="enemy-name">${htmlEscape(m.name)}</span><span class="enemy-hp">HP ${remainingHP}/100</span></div></div>
-      ${correct?`<img class="projectile" src="${effectArt(used,skill)}" alt="기술 ${htmlEscape(move)}가 몬스터에게 날아갑니다">
+      ${correct?`<img class="projectile" src="${used==='forest'?'./assets/animations/effects/forest_vortex.webp':effectArt(used,skill)}" alt="기술 ${htmlEscape(move)}가 몬스터에게 날아갑니다">
         <div class="attack-impact" aria-hidden="true"><div class="impact-ring"></div><div class="impact-ring second"></div>${particles}</div>
         <div class="attack-damage" aria-hidden="true">-25</div>`:''}
     </div>
