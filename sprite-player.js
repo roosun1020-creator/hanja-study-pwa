@@ -1,5 +1,5 @@
-/* 한자 탐험대 PWA v2.1.4 — 3단계 드래곤 애니메이션 재생기
- * 드래곤 3종 × 진화 3단계 × (대기 8 / 공격 8 / 승리 8) 프레임.
+/* 한자 탐험대 PWA v2.1.5 — 3단계 드래곤 애니메이션 재생기
+ * 드래곤 3종 × 진화 3단계 × (대기 12 / 공격 14 / 승리 12) 프레임.
  * 기존 학습·전투 판정·저장 로직을 수정하지 않습니다.
  */
 (() => {
@@ -7,9 +7,9 @@
   const ELEMENTS = new Set(['fire', 'water', 'forest']);
   const SIZE = 256;
   const MODES = Object.freeze({
-    idle:    { frames: 8,  fps: 5.0, loop: true,  linger: 0 },
-    attack:  { frames: 8, fps: 4.25, loop: false, linger: 720 },
-    victory: { frames: 8,  fps: 5.2, loop: false, linger: 680 }
+    idle:    { frames: 12, fps: 8.0, loop: true,  linger: 0 },
+    attack:  { frames: 14, fps: 10.0, loop: false, linger: 720 },
+    victory: { frames: 12, fps: 8.0, loop: false, linger: 680 }
   });
   const imagePromises = new Map();
   const actors = new Set();
@@ -122,7 +122,7 @@
       img.dataset.spriteMounted = '1';
       const key = img.dataset.spriteDragon;
       const stage = Number(img.dataset.spriteStage);
-      // Evolution stages 2 and 3 have dedicated 8-frame sprites; fallback keeps original portrait.
+      // Evolution stages 2 and 3 have dedicated 12/14/12-frame sprites; fallback keeps original portrait.
       if (!ELEMENTS.has(key) || !Number.isInteger(stage) || stage < 1 || stage > 3 || !img.parentNode) continue;
       const holder = document.createElement('span');
       holder.className = 'sprite-holder';
@@ -165,7 +165,7 @@
       if (!document.hidden) schedule();
     });
   }
-  window.HanjaSprites = { mount, play, version: '2.1.4', modes: MODES };
+  window.HanjaSprites = { mount, play, version: '2.1.5', modes: MODES };
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', setup, { once: true });
   } else setup();
